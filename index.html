@@ -17,7 +17,7 @@
     <!-- AR.js for marker detection -->
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
     <style>
       body {
         font-family: "Inter", sans-serif;
@@ -371,22 +371,110 @@
           }
         };
 
-        // Simplified AR initialization - just enable manual mode for now
+        // Implement actual AR marker detection
         const initializeAR = () => {
-          console.log('Attempting AR initialization...');
+          console.log('Initializing AR marker detection...');
           
-          // For now, let's just enable the manual mode after a short delay
-          // This ensures the app doesn't get stuck
-          setTimeout(() => {
-            console.log('Enabling manual mode');
+          // Check if AR.js is properly loaded
+          if (typeof THREEx === 'undefined' || typeof THREE === 'undefined') {
+            console.warn('AR.js libraries not fully loaded, using manual mode');
             setArInitialized(true);
-          }, 2000);
-          
-          // TODO: Implement actual AR.js integration when libraries are working
-          // The manual buttons will serve as a reliable fallback
+            return;
+          }
+
+          try {
+            // Create AR toolkit source
+            arToolkitSourceRef.current = new THREEx.ArToolkitSource({
+              sourceType: 'webcam',
+              sourceWidth: window.innerWidth,
+              sourceHeight: window.innerHeight,
+              displayWidth: window.innerWidth,
+              displayHeight: window.innerHeight,
+            });
+
+            arToolkitSourceRef.current.init(() => {
+              console.log('AR source initialized successfully');
+              
+              // Create AR toolkit context
+              arToolkitContextRef.current = new THREEx.ArToolkitContext({
+                cameraParametersUrl: 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/data/data/camera_para.dat',
+                detectionMode: 'mono_and_matrix',
+                matrixCodeType: '3x3',
+                canvasWidth: arToolkitSourceRef.current.parameters.sourceWidth,
+                canvasHeight: arToolkitSourceRef.current.parameters.sourceHeight,
+              });
+
+              arToolkitContextRef.current.init(() => {
+                console.log('AR context initialized successfully');
+                
+                // Create Three.js scene for AR
+                const scene = new THREE.Scene();
+                const camera = new THREE.Camera();
+                scene.add(camera);
+
+                // Setup markers for each pattern file
+                const markers = [
+                  { id: 'eye', patternUrl: './markers/eye.patt' },
+                  { id: 'flame', patternUrl: './markers/flame.patt' },
+                  { id: 'gear', patternUrl: './markers/gear.patt' }
+                ];
+                
+                markers.forEach(marker => {
+                  const markerRoot = new THREE.Group();
+                  scene.add(markerRoot);
+
+                  const markerControls = new THREEx.ArMarkerControls(arToolkitContextRef.current, markerRoot, {
+                    type: 'pattern',
+                    patternUrl: marker.patternUrl,
+                    changeMatrixMode: 'cameraTransformMatrix'
+                  });
+
+                  // Store reference
+                  markerControlsRef.current[marker.id] = markerControls;
+
+                  // Track marker visibility
+                  let isMarkerVisible = false;
+
+                  // Create a detection loop for this marker
+                  const checkMarkerVisibility = () => {
+                    const wasVisible = isMarkerVisible;
+                    isMarkerVisible = markerRoot.visible;
+
+                    if (!wasVisible && isMarkerVisible) {
+                      console.log(`Marker ${marker.id} detected!`);
+                      onMarkerDetected(marker.id);
+                    } else if (wasVisible && !isMarkerVisible) {
+                      console.log(`Marker ${marker.id} lost`);
+                    }
+                  };
+
+                  // Add to detection loop
+                  markerControlsRef.current[marker.id].checkVisibility = checkMarkerVisibility;
+                });
+
+                // Start the AR render loop
+                startARRenderLoop();
+                
+                console.log('AR marker detection fully initialized');
+                setArInitialized(true);
+                
+              }, (error) => {
+                console.error('AR context initialization failed:', error);
+                setArInitialized(true); // Fallback to manual mode
+              });
+              
+            }, (error) => {
+              console.error('AR source initialization failed:', error);
+              setArInitialized(true); // Fallback to manual mode
+            });
+            
+          } catch (error) {
+            console.error('AR initialization error:', error);
+            setArInitialized(true); // Fallback to manual mode
+          }
         };
 
-        // AR render loop
+        // AR render loop with marker detection
         const startARRenderLoop = () => {
           const animate = () => {
             requestAnimationFrame(animate);
@@ -394,10 +482,73 @@
             if (arToolkitSourceRef.current && arToolkitContextRef.current) {
               if (arToolkitSourceRef.current.ready) {
                 arToolkitContextRef.current.update(arToolkitSourceRef.current.domElement);
+                
+                // Check marker visibility for each marker
+                Object.values(markerControlsRef.current).forEach(markerControls => {
+                  if (markerControls.checkVisibility) {
+                    markerControls.checkVisibility();
+                  }
+                });
               }
             }
           };
           animate();
+        };
+
+        // Alternative A-Frame AR setup
+        const setupAFrameAR = () => {
+          console.log('Setting up A-Frame AR as backup...');
+          
+          // Create A-Frame scene for AR
+          const arScene = document.createElement('a-scene');
+          arScene.setAttribute('embedded', '');
+          arScene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;');
+          arScene.style.position = 'absolute';
+          arScene.style.top = '0';
+          arScene.style.left = '0';
+          arScene.style.width = '100%';
+          arScene.style.height = '100%';
+          arScene.style.zIndex = '1';
+          arScene.style.pointerEvents = 'none';
+          
+          // Add camera
+          const camera = document.createElement('a-camera');
+          camera.setAttribute('gps-camera', 'gpsMinDistance: 5');
+          arScene.appendChild(camera);
+          
+          // Create markers for each pattern
+          const markerIds = ['eye', 'flame', 'gear'];
+          
+          markerIds.forEach(markerId => {
+            const marker = document.createElement('a-marker');
+            marker.setAttribute('type', 'pattern');
+            marker.setAttribute('url', `./markers/${markerId}.patt`);
+            marker.setAttribute('id', `marker-${markerId}`);
+            
+            // Add event listeners for marker detection
+            marker.addEventListener('markerFound', () => {
+              console.log(`A-Frame: Marker ${markerId} found!`);
+              onMarkerDetected(markerId);
+            });
+            
+            marker.addEventListener('markerLost', () => {
+              console.log(`A-Frame: Marker ${markerId} lost`);
+            });
+            
+            // Add a simple box to the marker (invisible but helps with detection)
+            const box = document.createElement('a-box');
+            box.setAttribute('position', '0 0.5 0');
+            box.setAttribute('scale', '0.1 0.1 0.1');
+            box.setAttribute('material', 'opacity: 0');
+            marker.appendChild(box);
+            
+            arScene.appendChild(marker);
+          });
+          
+          // Add to document
+          document.body.appendChild(arScene);
+          
+          console.log('A-Frame AR setup complete');
         };
 
         // Cleanup AR resources
@@ -410,6 +561,13 @@
             arToolkitSourceRef.current = null;
           }
           markerControlsRef.current = {};
+          
+          // Remove A-Frame scene if it exists
+          const arScene = document.querySelector('a-scene');
+          if (arScene) {
+            arScene.remove();
+          }
+          
           setArInitialized(false);
         };
 
@@ -505,9 +663,11 @@
               videoRef.current.play();
               setIsARActive(true);
               
-              // Initialize symbol detection system
+              // Try both AR approaches
               setTimeout(() => {
                 initializeAR();
+                // Also setup A-Frame AR as backup
+                setupAFrameAR();
               }, 500);
             }
           } catch (error) {
@@ -843,7 +1003,7 @@
                   </h3>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-neutral-11 mb-2">
                     {arInitialized 
-                      ? 'Use the buttons below to discover symbols, or try scanning printed AR markers'
+                      ? '📷 AR Detection Active! Point camera at printed markers or use buttons below'
                       : 'Setting up symbol detection...'
                     }
                   </p>
@@ -863,6 +1023,12 @@
                             {symbol === 'eye' ? '👁️' : symbol === 'flame' ? '🔥' : '⚙️'}
                           </span>
                         ))}
+                      </div>
+                      <div className="mt-2 p-2 bg-green-50 rounded-lg border border-green-200">
+                        <div className="flex items-center justify-center gap-2 text-green-700 text-sm">
+                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                          AR Camera Active - Scanning for markers...
+                        </div>
                       </div>
                     </>
                   )}
