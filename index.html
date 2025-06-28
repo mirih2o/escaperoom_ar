@@ -14,63 +14,78 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <!-- AR.js for marker detection -->
-    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.js"></script>
+    <!-- THREE.js library (required by AR.js THREEx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- AR.js THREEx for marker detection -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/three.js/build/ar-threex.js"></script>
     <style>
       body {
         font-family: "Inter", sans-serif;
         margin: 0;
         overflow: hidden; /* Prevent scrolling */
+        touch-action: none; /* Prevent default touch behaviors */
+      }
+      /* Fix for touch event passive listener warnings */
+      * {
+        touch-action: manipulation;
       }
       /* Custom styles to mimic Spark components or enhance appearance */
       .dialog-overlay {
-        background-color: rgba(0, 0, 0, 0.5);
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
       }
       .dialog-content {
         background-color: #ffffff;
-        border-radius: 1rem;
-        padding: 2rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        max-width: 28rem; /* max-w-md */
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        max-width: 24rem; /* max-w-sm */
         width: 90%; /* w-11/12 */
+        border: 1px solid rgba(229, 231, 235, 0.8);
       }
       .btn-primary {
-        background-color: #0d6efd; /* Bootstrap primary blue */
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 1rem 2rem;
-        border-radius: 0.75rem;
-        font-weight: 500;
-        transition: background-color 0.2s ease-in-out;
-        min-height: 56px; /* Larger touch target size */
-        font-size: 1rem; /* Default to text-base */
+        border-radius: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        min-height: 60px;
+        font-size: 1rem;
+        border: none;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
       }
       .btn-primary:hover {
-        background-color: #0b5ed7;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
       }
       .btn-primary:active {
-        background-color: #0a58ca;
-        transform: scale(0.95);
+        transform: translateY(0);
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
       }
       .btn-secondary {
-        background-color: #6c757d; /* Bootstrap secondary grey */
-        color: white;
-        padding: 0.75rem 1.25rem;
-        border-radius: 0.75rem;
+        background: rgba(255, 255, 255, 0.9);
+        color: #4a5568;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
         font-weight: 500;
-        transition: background-color 0.2s ease-in-out;
-        min-height: 56px; /* Larger touch target size */
-        min-width: 56px;
-        font-size: 0.875rem; /* Default to text-sm */
+        transition: all 0.3s ease;
+        min-height: 44px;
+        min-width: 44px;
+        font-size: 0.75rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       }
       .btn-secondary:hover {
-        background-color: #5c636a;
+        background: rgba(255, 255, 255, 0.95);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
       }
       .btn-secondary:active {
-        background-color: #495057;
-        transform: scale(0.95);
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
 
       /* Responsive font sizes for different screen sizes */
@@ -219,28 +234,19 @@
           symbols: {
             flame: {
               emoji: "🔥",
-              position: {
-                x: window.innerWidth * 0.35,
-                y: window.innerHeight * 0.15,
-              },
+              position: null, // Will be calculated dynamically
               color: "#ff4400",
               hint: "The flame burns brightest on the right",
             },
             gear: {
               emoji: "⚙️",
-              position: {
-                x: window.innerWidth * 0.5,
-                y: window.innerHeight * 0.15,
-              },
+              position: null, // Will be calculated dynamically
               color: "#888888",
               hint: "The gear sits in a corner",
             },
             eye: {
               emoji: "👁️",
-              position: {
-                x: window.innerWidth * 0.65,
-                y: window.innerHeight * 0.15,
-              },
+              position: null, // Will be calculated dynamically
               color: "#00ffff",
               hint: "The eye watches from above",
             },
@@ -258,55 +264,37 @@
           symbols: {
             flame: {
               emoji: "🔥",
-              position: {
-                x: window.innerWidth * 0.35,
-                y: window.innerHeight * 0.15,
-              },
+              position: null, // Will be calculated dynamically
               color: "#ff4400",
               hint: "The flame glows from above",
             },
             gear: {
               emoji: "⚙️",
-              position: {
-                x: window.innerWidth * 0.5,
-                y: window.innerHeight * 0.15,
-              },
+              position: null, // Will be calculated dynamically
               color: "#888888",
               hint: "The gear turns in harmony with others",
             },
             eye: {
               emoji: "👁️",
-              position: {
-                x: window.innerWidth * 0.65,
-                y: window.innerHeight * 0.15,
-              },
+              position: null, // Will be calculated dynamically
               color: "#00ffff",
               hint: "The eye keeps balance in the center",
             },
             star: {
               emoji: "⭐",
-              position: {
-                x: window.innerWidth * 0.35,
-                y: window.innerHeight * 0.05,
-              },
+              position: null, // Will be calculated dynamically
               color: "#ffff00",
               hint: "The star guides from the eastern edge",
             },
             moon: {
               emoji: "🌙",
-              position: {
-                x: window.innerWidth * 0.5,
-                y: window.innerHeight * 0.05,
-              },
+              position: null, // Will be calculated dynamically
               color: "#cccccc",
               hint: "The moon reflects light from below",
             },
             sun: {
               emoji: "☀️",
-              position: {
-                x: window.innerWidth * 0.65,
-                y: window.innerHeight * 0.05,
-              },
+              position: null, // Will be calculated dynamically
               color: "#ffaa00",
               hint: "The sun brings warmth to the west",
             },
@@ -337,14 +325,8 @@
         const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 }); // Not currently used for symbol position
         // Track which symbols have been discovered via AR markers
         const [discoveredSymbols, setDiscoveredSymbols] = useState(new Set());
-        const [positions, setPositions] = useState(() =>
-          Object.fromEntries(
-            Object.entries(STAGES[0].symbols).map(([symbol, config]) => [
-              symbol,
-              { ...config.position },
-            ])
-          )
-        );
+        const [positions, setPositions] = useState({});
+        const [showAllSymbolsFoundMessage, setShowAllSymbolsFoundMessage] = useState(false);
 
         const [cellSize, setCellSize] = useState(0);
         const [gridOffsetX, setGridOffsetX] = useState(0);
@@ -355,6 +337,35 @@
         const arToolkitSourceRef = useRef(null);
         const arToolkitContextRef = useRef(null);
         const markerControlsRef = useRef({});
+
+        // Calculate initial symbol positions based on available space
+        const calculateInitialPositions = (stage) => {
+          const topUIHeight = 80;
+          const sidePadding = 40; // More generous padding
+          
+          // Calculate symbol area (above the grid)
+          const symbolAreaWidth = window.innerWidth - (sidePadding * 2);
+          const symbolAreaTop = 10; // Small margin from very top
+          const symbolAreaHeight = 50; // Height for symbol placement
+          
+          const symbols = Object.keys(STAGES[stage].symbols);
+          const positions = {};
+          
+          // Arrange symbols horizontally with even spacing
+          if (symbols.length > 0) {
+            symbols.forEach((symbol, index) => {
+              const spacing = symbolAreaWidth / symbols.length;
+              const xOffset = spacing * index + spacing / 2;
+              
+              positions[symbol] = {
+                x: sidePadding + xOffset,
+                y: symbolAreaTop + symbolAreaHeight / 2
+              };
+            });
+          }
+          
+          return positions;
+        };
 
         // AR marker detection function
         const onMarkerDetected = (markerId) => {
@@ -378,12 +389,13 @@
           // Check if AR.js is properly loaded
           if (typeof THREEx === 'undefined' || typeof THREE === 'undefined') {
             console.warn('AR.js libraries not fully loaded, using manual mode');
+            setArError('AR libraries not loaded');
             setArInitialized(true);
             return;
           }
 
           try {
-            // Create AR toolkit source
+            // Create AR toolkit source with camera access
             arToolkitSourceRef.current = new THREEx.ArToolkitSource({
               sourceType: 'webcam',
               sourceWidth: window.innerWidth,
@@ -394,6 +406,16 @@
 
             arToolkitSourceRef.current.init(() => {
               console.log('AR source initialized successfully');
+              
+              // Show the camera feed in the video element
+              if (videoRef.current && arToolkitSourceRef.current.domElement) {
+                // Copy the video stream to our video element for display
+                const sourceVideo = arToolkitSourceRef.current.domElement;
+                if (sourceVideo.srcObject) {
+                  videoRef.current.srcObject = sourceVideo.srcObject;
+                  videoRef.current.play();
+                }
+              }
               
               // Create AR toolkit context
               arToolkitContextRef.current = new THREEx.ArToolkitContext({
@@ -460,16 +482,19 @@
                 
               }, (error) => {
                 console.error('AR context initialization failed:', error);
+                setArError('AR context failed');
                 setArInitialized(true); // Fallback to manual mode
               });
               
             }, (error) => {
               console.error('AR source initialization failed:', error);
+              setArError('Camera access failed');
               setArInitialized(true); // Fallback to manual mode
             });
             
           } catch (error) {
             console.error('AR initialization error:', error);
+            setArError('AR initialization failed');
             setArInitialized(true); // Fallback to manual mode
           }
         };
@@ -495,62 +520,6 @@
           animate();
         };
 
-        // Alternative A-Frame AR setup
-        const setupAFrameAR = () => {
-          console.log('Setting up A-Frame AR as backup...');
-          
-          // Create A-Frame scene for AR
-          const arScene = document.createElement('a-scene');
-          arScene.setAttribute('embedded', '');
-          arScene.setAttribute('arjs', 'sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;');
-          arScene.style.position = 'absolute';
-          arScene.style.top = '0';
-          arScene.style.left = '0';
-          arScene.style.width = '100%';
-          arScene.style.height = '100%';
-          arScene.style.zIndex = '1';
-          arScene.style.pointerEvents = 'none';
-          
-          // Add camera
-          const camera = document.createElement('a-camera');
-          camera.setAttribute('gps-camera', 'gpsMinDistance: 5');
-          arScene.appendChild(camera);
-          
-          // Create markers for each pattern
-          const markerIds = ['eye', 'flame', 'gear'];
-          
-          markerIds.forEach(markerId => {
-            const marker = document.createElement('a-marker');
-            marker.setAttribute('type', 'pattern');
-            marker.setAttribute('url', `./markers/${markerId}.patt`);
-            marker.setAttribute('id', `marker-${markerId}`);
-            
-            // Add event listeners for marker detection
-            marker.addEventListener('markerFound', () => {
-              console.log(`A-Frame: Marker ${markerId} found!`);
-              onMarkerDetected(markerId);
-            });
-            
-            marker.addEventListener('markerLost', () => {
-              console.log(`A-Frame: Marker ${markerId} lost`);
-            });
-            
-            // Add a simple box to the marker (invisible but helps with detection)
-            const box = document.createElement('a-box');
-            box.setAttribute('position', '0 0.5 0');
-            box.setAttribute('scale', '0.1 0.1 0.1');
-            box.setAttribute('material', 'opacity: 0');
-            marker.appendChild(box);
-            
-            arScene.appendChild(marker);
-          });
-          
-          // Add to document
-          document.body.appendChild(arScene);
-          
-          console.log('A-Frame AR setup complete');
-        };
-
         // Cleanup AR resources
         const cleanupAR = () => {
           if (arToolkitContextRef.current) {
@@ -562,12 +531,6 @@
           }
           markerControlsRef.current = {};
           
-          // Remove A-Frame scene if it exists
-          const arScene = document.querySelector('a-scene');
-          if (arScene) {
-            arScene.remove();
-          }
-          
           setArInitialized(false);
         };
 
@@ -575,8 +538,23 @@
         useEffect(() => {
           if (currentStage === 0 && discoveredSymbols.size === 3) {
             setShowGrid(true);
+            setShowAllSymbolsFoundMessage(true);
+            
+            // Fade out the message after 3 seconds
+            const timer = setTimeout(() => {
+              setShowAllSymbolsFoundMessage(false);
+            }, 3000);
+            
+            return () => clearTimeout(timer);
           }
         }, [discoveredSymbols, currentStage]);
+
+        // Initial setup effect
+        useEffect(() => {
+          // Set initial positions on component mount
+          const initialPositions = calculateInitialPositions(currentStage);
+          setPositions(initialPositions);
+        }, []);
 
         // Cleanup AR resources on unmount
         useEffect(() => {
@@ -585,22 +563,36 @@
           };
         }, []);
 
-        // Update grid dimensions on window resize
+        // Update grid dimensions and symbol positions on window resize
         useEffect(() => {
           const updateGridDimensions = () => {
-            // Better mobile-friendly sizing with larger cells for bigger symbols
-            const padding = 100; // More space for UI elements
-            const availableWidth = window.innerWidth - padding;
-            const availableHeight = window.innerHeight - padding;
+            // Account for UI elements and safe areas
+            const topUIHeight = 80; // Reduced space for top messages/indicators
+            const bottomUIHeight = 120; // Reduced space for bottom controls
+            const sidePadding = 20; // Minimum side padding
+            
+            const availableWidth = window.innerWidth - (sidePadding * 2);
+            const availableHeight = window.innerHeight - topUIHeight - bottomUIHeight;
             const minDimension = Math.min(availableWidth, availableHeight);
-            const newCellSize = Math.max(80, minDimension / 3.5); // Larger minimum cell size for bigger symbols
+            
+            // Ensure grid fits well on screen with minimum cell size
+            const newCellSize = Math.max(70, Math.min(110, minDimension / 3.5));
             setCellSize(newCellSize);
+            
+            // Center horizontally
             setGridOffsetX(
               window.innerWidth / 2 - (GRID_SIZE * newCellSize) / 2
             );
+            
+            // Center vertically in the available space
+            const gridHeight = GRID_SIZE * newCellSize;
             setGridOffsetY(
-              window.innerHeight / 2 - (GRID_SIZE * newCellSize) / 2
+              topUIHeight + (availableHeight - gridHeight) / 2
             );
+            
+            // Calculate and set initial positions for symbols
+            const initialPositions = calculateInitialPositions(currentStage);
+            setPositions(prev => ({ ...prev, ...initialPositions }));
           };
 
           updateGridDimensions();
@@ -617,7 +609,178 @@
               updateGridDimensions
             );
           };
-        }, []);
+        }, [currentStage]); // Add currentStage as dependency
+
+        // Handle touch events with non-passive listeners to prevent warnings
+        useEffect(() => {
+          const handleTouchStartNonPassive = (e) => {
+            const target = e.target;
+            const symbolElement = target.closest('[data-symbol]');
+            
+            if (symbolElement) {
+              e.preventDefault();
+              const symbol = symbolElement.getAttribute('data-symbol');
+              setDraggedSymbol(symbol);
+            }
+          };
+
+          const handleTouchMoveNonPassive = (e) => {
+            // Check if the target is the container or a draggable symbol
+            const container = containerRef.current;
+            const target = e.target;
+            
+            if (!container) return;
+            
+            // If it's the container or a child of the container
+            if (container.contains(target)) {
+              e.preventDefault();
+              
+              // Get touch coordinates
+              const touch = e.touches?.[0] || e.changedTouches?.[0];
+              const clientX = touch?.clientX || e.clientX;
+              const clientY = touch?.clientY || e.clientY;
+              
+              const containerRect = container.getBoundingClientRect();
+              const x = clientX - containerRect.left;
+              const y = clientY - containerRect.top;
+              
+              // Check if it's a draggable symbol (has data-symbol attribute)
+              const symbolElement = target.closest('[data-symbol]');
+              if (symbolElement) {
+                // Handle symbol dragging
+                setPositions((prev) => {
+                  const currentDraggedSymbol = Object.keys(prev).find(symbol => 
+                    document.querySelector(`[data-symbol="${symbol}"]`) === symbolElement
+                  );
+                  
+                  if (!currentDraggedSymbol) return prev;
+                  
+                  // Check if within grid bounds for snapping
+                  const col = Math.floor((x - gridOffsetX) / cellSize);
+                  const row = Math.floor((y - gridOffsetY) / cellSize);
+
+                  if (col >= 0 && col < GRID_SIZE && row >= 0 && row < GRID_SIZE) {
+                    // Snap to grid
+                    const snappedX = gridOffsetX + (col + 0.5) * cellSize;
+                    const snappedY = gridOffsetY + (row + 0.5) * cellSize;
+                    return {
+                      ...prev,
+                      [currentDraggedSymbol]: { x: snappedX, y: snappedY },
+                    };
+                  } else {
+                    // Follow cursor if not within grid
+                    return {
+                      ...prev,
+                      [currentDraggedSymbol]: { x, y },
+                    };
+                  }
+                });
+              } else {
+                // Handle cursor tracking
+                setCursorPosition({ x, y });
+              }
+            }
+          };
+
+          const handleTouchEndNonPassive = (e) => {
+            const target = e.target;
+            const symbolElement = target.closest('[data-symbol]');
+            
+            if (symbolElement) {
+              e.preventDefault();
+              
+              // Get the symbol being dropped
+              const symbol = symbolElement.getAttribute('data-symbol');
+              
+              // Handle drop logic
+              setPositions((prevPositions) => {
+                const currentPos = prevPositions[symbol];
+                if (!currentPos) return prevPositions;
+                
+                const col = Math.floor((currentPos.x - gridOffsetX) / cellSize);
+                const row = Math.floor((currentPos.y - gridOffsetY) / cellSize);
+
+                let updatedPositions = prevPositions;
+
+                // Check if the cell is within grid bounds
+                if (col >= 0 && col < GRID_SIZE && row >= 0 && row < GRID_SIZE) {
+                  // Check if any other symbol is in this cell
+                  const occupyingSymbol = Object.entries(prevPositions).find(
+                    ([otherSymbol, pos]) => {
+                      if (otherSymbol === symbol) return false;
+                      const otherCol = Math.floor((pos.x - gridOffsetX) / cellSize);
+                      const otherRow = Math.floor((pos.y - gridOffsetY) / cellSize);
+                      return otherCol === col && otherRow === row;
+                    }
+                  );
+
+                  if (!occupyingSymbol) {
+                    // Cell is free, snap to grid center
+                    updatedPositions = {
+                      ...prevPositions,
+                      [symbol]: {
+                        x: gridOffsetX + (col + 0.5) * cellSize,
+                        y: gridOffsetY + (row + 0.5) * cellSize,
+                      },
+                    };
+                  }
+                } else {
+                  // Return to original position if drop is invalid
+                  const initialPositions = calculateInitialPositions(currentStage);
+                  updatedPositions = {
+                    ...prevPositions,
+                    [symbol]: initialPositions[symbol] || prevPositions[symbol],
+                  };
+                }
+                
+                // Check win condition with the updated positions
+                setTimeout(() => {
+                  let isWin = true;
+                  const currentWinningPositions = STAGES[currentStage].winningPositions;
+
+                  Object.entries(updatedPositions).forEach(([sym, position]) => {
+                    const target = currentWinningPositions[sym];
+                    if (!target) {
+                      isWin = false;
+                      return;
+                    }
+                    const targetPixel = {
+                      x: gridOffsetX + (target.col + 0.5) * cellSize,
+                      y: gridOffsetY + (target.row + 0.5) * cellSize,
+                    };
+                    const distance = Math.sqrt(
+                      Math.pow(targetPixel.x - position.x, 2) +
+                        Math.pow(targetPixel.y - position.y, 2)
+                    );
+
+                    if (distance > TOLERANCE) {
+                      isWin = false;
+                    }
+                  });
+
+                  if (isWin) {
+                    setShowSuccess(true);
+                  }
+                }, 50);
+                
+                return updatedPositions;
+              });
+              
+              setDraggedSymbol(null);
+            }
+          };
+
+          // Add non-passive touch listeners to document
+          document.addEventListener('touchstart', handleTouchStartNonPassive, { passive: false });
+          document.addEventListener('touchmove', handleTouchMoveNonPassive, { passive: false });
+          document.addEventListener('touchend', handleTouchEndNonPassive, { passive: false });
+
+          return () => {
+            document.removeEventListener('touchstart', handleTouchStartNonPassive);
+            document.removeEventListener('touchmove', handleTouchMoveNonPassive);
+            document.removeEventListener('touchend', handleTouchEndNonPassive);
+          };
+        }, [gridOffsetX, gridOffsetY, cellSize, currentStage]);
 
         // Convert grid position to pixel coordinates
         const gridToPixel = (col, row) => ({
@@ -654,32 +817,41 @@
 
         const startAR = async () => {
           try {
-            const stream = await navigator.mediaDevices.getUserMedia({
-              video: { facingMode: "environment" },
-            });
-
-            if (videoRef.current) {
-              videoRef.current.srcObject = stream;
-              videoRef.current.play();
-              setIsARActive(true);
+            setIsARActive(true);
+            
+            // Try AR initialization first
+            setTimeout(() => {
+              initializeAR();
               
-              // Try both AR approaches
+              // If AR fails, fallback to basic camera access after a delay
               setTimeout(() => {
-                initializeAR();
-                // Also setup A-Frame AR as backup
-                setupAFrameAR();
-              }, 500);
-            }
+                if (arError && videoRef.current && !videoRef.current.srcObject) {
+                  console.log('AR failed, trying fallback camera access...');
+                  navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment" }
+                  }).then(stream => {
+                    if (videoRef.current) {
+                      videoRef.current.srcObject = stream;
+                      videoRef.current.play();
+                      console.log('Fallback camera initialized');
+                    }
+                  }).catch(err => {
+                    console.error('Fallback camera access failed:', err);
+                  });
+                }
+              }, 2000);
+            }, 500);
+            
           } catch (error) {
-            console.error("Error accessing camera:", error);
+            console.error("Error starting AR:", error);
             // Provide a user-friendly message instead of alert
             const messageBox = document.createElement("div");
             messageBox.className =
               "fixed inset-0 flex items-center justify-center z-[100] dialog-overlay";
             messageBox.innerHTML = `
                         <div class="dialog-content text-center">
-                            <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-6">Camera Access Denied</h2>
-                            <p class="text-base sm:text-lg md:text-xl mb-6">Please allow camera access to start the AR experience.</p>
+                            <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-6">AR Initialization Failed</h2>
+                            <p class="text-base sm:text-lg md:text-xl mb-6">Please try again or use manual mode.</p>
                             <button class="mt-6 px-6 py-3 bg-blue-500 text-white rounded-lg text-base sm:text-lg md:text-xl hover:bg-blue-600 transition-colors font-medium" onclick="this.parentElement.parentElement.remove()">OK</button>
                         </div>
                     `;
@@ -718,14 +890,7 @@
           if (currentStage < STAGES.length - 1) {
             const nextStageIndex = currentStage + 1;
             setCurrentStage(nextStageIndex);
-            // Reset positions for the new stage symbols
-            setPositions(
-              Object.fromEntries(
-                Object.entries(STAGES[nextStageIndex].symbols).map(
-                  ([symbol, config]) => [symbol, { ...config.position }]
-                )
-              )
-            );
+            // Reset positions for the new stage symbols will be handled by useEffect
             setShowSuccess(false);
             setShowHints(false); // Hide hints for new stage
             // Reset AR discovery for the new stage
@@ -740,13 +905,8 @@
         };
 
         const resetPositions = () => {
-          setPositions(
-            Object.fromEntries(
-              Object.entries(STAGES[currentStage].symbols).map(
-                ([symbol, config]) => [symbol, { ...config.position }]
-              )
-            )
-          );
+          const initialPositions = calculateInitialPositions(currentStage);
+          setPositions(prev => ({ ...prev, ...initialPositions }));
         };
 
         const snapToGrid = (x, y) => {
@@ -819,9 +979,10 @@
             // If cell is occupied, send the other symbol back to its original position
             if (occupyingSymbol) {
               const [symbol] = occupyingSymbol;
+              const initialPositions = calculateInitialPositions(currentStage);
               setPositions((prev) => ({
                 ...prev,
-                [symbol]: { ...STAGES[currentStage].symbols[symbol].position },
+                [symbol]: initialPositions[symbol],
               }));
             }
           }
@@ -854,10 +1015,11 @@
           icon,
           onClick,
           children,
+          className,
           "aria-label": ariaLabel,
         }) => {
           const baseClasses =
-            "flex items-center justify-center gap-2 rounded-md font-medium transition-colors duration-200";
+            "flex items-center justify-center gap-2 font-medium transition-all";
           const variantClasses = {
             primary: "btn-primary",
             secondary: "btn-secondary",
@@ -865,7 +1027,7 @@
 
           return (
             <button
-              className={`${baseClasses} ${variantClasses[variant]}`}
+              className={`${baseClasses} ${variantClasses[variant]} ${className || ''}`}
               onClick={onClick}
               aria-label={ariaLabel}
             >
@@ -881,7 +1043,6 @@
             ref={containerRef}
             onDragOver={(e) => e.preventDefault()}
             onMouseMove={handlePointerMove}
-            onTouchMove={handlePointerMove}
             style={{ touchAction: "none" }}
           >
             <video
@@ -905,7 +1066,7 @@
                   }}
                 >
                   {Array.from({ length: 9 }).map((_, i) => (
-                    <div key={i} className="border-4 border-white/40" />
+                    <div key={i} className="border-2 border-white/60 bg-white/10 backdrop-blur-sm" />
                   ))}
                 </div>
               )}
@@ -915,43 +1076,50 @@
                 // In stage 1, only show symbols that have been discovered via AR markers
                 return currentStage !== 0 || discoveredSymbols.has(symbol);
               })
-              .map(([symbol, config]) => (
-                <div
-                  key={symbol}
-                  className="absolute cursor-move text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl select-none touch-none"
-                  style={{
-                    left: positions[symbol].x,
-                    top: positions[symbol].y,
-                    transform: "translate(-50%, -50%)",
-                    zIndex: draggedSymbol === symbol ? 10 : 5, // Bring dragged symbol to front
-                    filter:
-                      draggedSymbol === symbol
-                        ? "drop-shadow(0 4px 8px rgba(0,0,0,0.3))"
-                        : "none",
-                    transition:
-                      draggedSymbol === symbol ? "none" : "all 0.2s ease",
-                  }}
-                  draggable
-                  onDragStart={(e) => handleDragStart(e, symbol)}
-                  onDrag={handleDrag}
-                  onDragEnd={handleDragEnd}
-                  onTouchStart={(e) => handleDragStart(e, symbol)}
-                  onTouchMove={handleDrag}
-                  onTouchEnd={handleDragEnd}
-                >
-                  {config.emoji}
-                </div>
-              )
+              .map(([symbol, config]) => {
+                // Ensure position exists, if not use fallback
+                const symbolPosition = positions[symbol] || { x: 50, y: 50 };
+                
+                return (
+                  <div
+                    key={symbol}
+                    className="absolute cursor-move text-3xl sm:text-4xl md:text-5xl select-none touch-none"
+                    data-symbol={symbol}
+                    style={{
+                      left: symbolPosition.x,
+                      top: symbolPosition.y,
+                      transform: "translate(-50%, -50%)",
+                      zIndex: draggedSymbol === symbol ? 10 : 5, // Bring dragged symbol to front
+                      filter:
+                        draggedSymbol === symbol
+                          ? "drop-shadow(0 4px 8px rgba(0,0,0,0.3))"
+                          : "drop-shadow(0 2px 4px rgba(0,0,0,0.2))",
+                      transition:
+                        draggedSymbol === symbol ? "none" : "all 0.2s ease",
+                    }}
+                    draggable
+                    onDragStart={(e) => handleDragStart(e, symbol)}
+                    onDrag={handleDrag}
+                    onDragEnd={handleDragEnd}
+                  >
+                    {config.emoji}
+                  </div>
+                );
+              }
             )}
 
             {showHints && (
-              <div className="absolute bottom-20 sm:bottom-24 left-4 right-4 bg-neutral-3 p-3 sm:p-4 rounded-xl max-w-sm sm:max-w-md mx-auto z-20 leading-tight">
-                <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-2 flex items-center gap-3 leading-tight">
-                  <LightbulbFilamentIcon className="text-accent-9" size={24} />
+              <div className="absolute left-1/2 transform -translate-x-1/2 bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 max-w-xs sm:max-w-sm mx-2 z-20"
+                style={{
+                  bottom: `${window.innerHeight < 600 ? '120px' : '140px'}`
+                }}
+              >
+                <h3 className="text-base font-semibold mb-2 flex items-center gap-2 text-gray-800">
+                  <LightbulbFilamentIcon className="text-yellow-500" size={18} />
                   Hints
                 </h3>
                 {STAGES[currentStage].neutralHints?.hint && (
-                  <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-2 leading-tight">
+                  <p className="text-sm mb-2 text-gray-700">
                     {STAGES[currentStage].neutralHints.hint}
                   </p>
                 )}
@@ -963,9 +1131,9 @@
                   .map(([symbol, config]) => (
                     <p
                       key={symbol}
-                      className="text-sm sm:text-base md:text-lg lg:text-xl mb-2 leading-tight"
+                      className="text-sm mb-2 text-gray-700"
                     >
-                      <span className="mr-3 text-lg sm:text-xl md:text-2xl lg:text-3xl">
+                      <span className="mr-2 text-base">
                         {config.emoji}
                       </span>
                       {config.hint}
@@ -976,18 +1144,18 @@
             )}
 
             {!isARActive && (
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div className="text-center">
+              <div className="absolute inset-0 flex items-center justify-center z-10 bg-gradient-to-br from-blue-50 to-indigo-100">
+                <div className="text-center p-6 bg-white rounded-xl shadow-lg border border-gray-200 max-w-sm mx-4">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-3">AR Puzzle Game</h2>
                   <CustomButton
                     variant="primary"
-                    icon={<CameraIcon size={28} />}
+                    icon={<CameraIcon size={20} />}
                     onClick={startAR}
+                    className="w-full"
                   >
-                    <span className="text-base sm:text-lg md:text-xl lg:text-2xl">
-                      Start AR Experience
-                    </span>
+                    Start AR Experience
                   </CustomButton>
-                  <p className="mt-4 text-sm sm:text-base md:text-lg text-gray-700 max-w-md mx-auto">
+                  <p className="mt-3 text-sm text-gray-600">
                     Find and scan AR markers to discover hidden symbols and unlock the puzzle grid
                   </p>
                 </div>
@@ -996,50 +1164,52 @@
 
             {/* AR Scanning Instructions for Stage 1 */}
             {isARActive && currentStage === 0 && discoveredSymbols.size < 3 && (
-              <div className="absolute top-4 left-4 right-4 bg-neutral-3 p-3 rounded-xl z-20">
+              <div className="fixed top-2 left-2 right-2 bg-white/95 backdrop-blur-sm p-3 rounded-lg z-20 shadow-lg border border-gray-200 max-w-md mx-auto">
                 <div className="text-center">
-                  <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-accent-11 mb-2">
-                    {arInitialized ? 'Ready to Find Symbols!' : 'Starting Camera...'}
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1">
+                    {arError ? '⚠️ Using Manual Mode' : arInitialized ? '🔍 Find Hidden Symbols' : '📷 Starting Camera...'}
                   </h3>
-                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-neutral-11 mb-2">
-                    {arInitialized 
-                      ? '📷 AR Detection Active! Point camera at printed markers or use buttons below'
-                      : 'Setting up symbol detection...'
+                  <p className="text-xs sm:text-sm text-gray-600 mb-2">
+                    {arError ? 'Camera ready - Use manual buttons below' : arInitialized 
+                      ? 'Point camera at markers or tap buttons below'
+                      : 'Setting up detection...'
                     }
                   </p>
                   {arInitialized && (
                     <>
-                      <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-accent-11">
-                        Found: {discoveredSymbols.size}/3 symbols
-                      </div>
-                      <div className="flex justify-center gap-2 mt-2">
-                        {['eye', 'flame', 'gear'].map((symbol) => (
-                          <span
-                            key={symbol}
-                            className={`text-xl sm:text-2xl md:text-3xl transition-opacity ${
-                              discoveredSymbols.has(symbol) ? 'opacity-100' : 'opacity-30'
-                            }`}
-                          >
-                            {symbol === 'eye' ? '👁️' : symbol === 'flame' ? '🔥' : '⚙️'}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="mt-2 p-2 bg-green-50 rounded-lg border border-green-200">
-                        <div className="flex items-center justify-center gap-2 text-green-700 text-sm">
-                          <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                          AR Camera Active - Scanning for markers...
+                      <div className="flex justify-center items-center gap-3 mb-2">
+                        <span className="text-sm font-medium text-gray-700">
+                          {discoveredSymbols.size}/3
+                        </span>
+                        <div className="flex gap-1">
+                          {['eye', 'flame', 'gear'].map((symbol) => (
+                            <span
+                              key={symbol}
+                              className={`text-lg transition-all duration-300 ${
+                                discoveredSymbols.has(symbol) 
+                                  ? 'opacity-100 scale-110' 
+                                  : 'opacity-20 scale-90'
+                              }`}
+                            >
+                              {symbol === 'eye' ? '👁️' : symbol === 'flame' ? '🔥' : '⚙️'}
+                            </span>
+                          ))}
                         </div>
+                      </div>
+                      <div className="flex items-center justify-center gap-1 text-green-600 text-xs">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                        AR Active
                       </div>
                     </>
                   )}
                   {!arInitialized && (
-                    <div className="flex justify-center mt-2 flex-col items-center gap-2">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-11"></div>
+                    <div className="flex justify-center items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-b-transparent border-blue-600"></div>
                       <button
                         onClick={() => setArInitialized(true)}
-                        className="px-3 py-1 text-xs bg-orange-200 text-orange-800 rounded hover:bg-orange-300"
+                        className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                       >
-                        Skip to Manual Mode
+                        Skip
                       </button>
                     </div>
                   )}
@@ -1049,84 +1219,89 @@
 
             {/* Grid revealed message for Stage 1 */}
             {isARActive && currentStage === 0 && discoveredSymbols.size === 3 && showGrid && (
-              <div className="absolute top-4 left-4 right-4 bg-green-600 p-3 rounded-xl z-20">
+              <div 
+                className={`fixed top-20 left-2 right-2 bg-green-50 border border-green-200 p-3 rounded-lg z-20 shadow-lg max-w-md mx-auto transition-opacity duration-1000 ${
+                  showAllSymbolsFoundMessage ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
                 <div className="text-center">
-                  <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-1">
-                    All Symbols Found!
+                  <h3 className="text-base font-semibold text-green-800 mb-1 flex items-center justify-center gap-2">
+                    ✅ All Symbols Found!
                   </h3>
-                  <p className="text-sm sm:text-base md:text-lg text-white">
-                    The grid is now revealed. Drag symbols to solve the puzzle.
+                  <p className="text-sm text-green-700">
+                    Drag symbols to solve the puzzle.
                   </p>
                 </div>
               </div>
             )}
 
             {isARActive && (
-              <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2 z-20">
+              <div className="fixed bottom-0 left-0 right-0 z-20 p-2">
                 {/* Development/Fallback AR testing buttons */}
                 {currentStage === 0 && (
-                  <div className="bg-blue-50 p-3 rounded-xl border-2 border-blue-200">
-                    <div className="text-center text-sm text-blue-800 mb-2 font-semibold">
-                      🎯 Symbol Discovery
+                  <div className="bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 mb-2 max-w-md mx-auto">
+                    <div className="text-center text-sm text-gray-800 font-medium mb-1">
+                      🎯 Manual Discovery
                     </div>
-                    <div className="text-center text-xs text-blue-700 mb-3">
-                      Click the buttons below to discover each symbol and unlock the puzzle grid
+                    <div className="text-center text-xs text-gray-600 mb-2">
+                      Tap if AR scanning doesn't work
                     </div>
-                    <div className="flex justify-center gap-2">
+                    <div className="flex justify-center gap-2 flex-wrap">
                       {['eye', 'flame', 'gear'].map((symbol) => (
                         <button
                           key={symbol}
                           onClick={() => onMarkerDetected(symbol)}
                           disabled={discoveredSymbols.has(symbol)}
-                          className={`px-4 py-3 text-base rounded-lg font-medium transition-colors ${
+                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex-shrink-0 ${
                             discoveredSymbols.has(symbol)
-                              ? 'bg-green-200 text-green-800 cursor-not-allowed'
-                              : 'bg-blue-200 text-blue-800 hover:bg-blue-300 cursor-pointer shadow-lg'
+                              ? 'bg-green-100 text-green-800 cursor-not-allowed'
+                              : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
                           }`}
                         >
-                          {symbol === 'eye' ? '👁️' : symbol === 'flame' ? '🔥' : '⚙️'} 
-                          <br />
-                          <span className="text-xs">Find {symbol}</span>
+                          {symbol === 'eye' ? '👁️ Eye' : symbol === 'flame' ? '🔥 Flame' : '⚙️ Gear'}
                         </button>
                       ))}
                     </div>
                   </div>
                 )}
 
-                <div className="flex flex-row justify-between items-center bg-neutral-3 p-2 sm:p-3 rounded-xl">
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm sm:text-base md:text-lg lg:text-xl text-accent-11 font-medium">
+                <div className="flex flex-row justify-between items-center bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 max-w-md mx-auto">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-gray-800">
                       Stage {currentStage + 1}/{STAGES.length}
                     </span>
                   </div>
-                  <div className="flex flex-row gap-2 items-center">
+                  <div className="flex flex-row gap-1 sm:gap-2 items-center">
                   <CustomButton
                     variant="secondary"
-                    icon={<LightbulbFilamentIcon size={20} />}
+                    icon={<LightbulbFilamentIcon size={16} />}
                     onClick={() => setShowHints(!showHints)}
                     aria-label="Toggle hints"
+                    className="text-xs px-2 py-2 min-w-10"
                   >
-                    <span className="hidden sm:inline text-sm sm:text-base md:text-lg">
+                    <span className="hidden sm:inline text-xs">
                       Hints
                     </span>
                   </CustomButton>
                   <CustomButton
                     variant="secondary"
-                    icon={<GridIcon size={20} />}
+                    icon={<GridIcon size={16} />}
                     onClick={() => setShowGrid(!showGrid)}
                     aria-label="Toggle grid"
+                    className="text-xs px-2 py-2 min-w-10"
                   >
-                    <span className="hidden sm:inline text-sm sm:text-base md:text-lg">
+                    <span className="hidden sm:inline text-xs">
                       Grid
                     </span>
                   </CustomButton>
                   <CustomButton
                     variant="secondary"
-                    icon={<ArrowCounterClockwiseIcon size={20} />}
+                    icon={<ArrowCounterClockwiseIcon size={16} />}
                     onClick={resetPositions}
                     aria-label="Reset positions"
+                    className="text-xs px-2 py-2 min-w-10"
                   >
-                    <span className="hidden sm:inline text-sm sm:text-base md:text-lg">
+                    <span className="hidden sm:inline text-xs">
                       Reset
                     </span>
                   </CustomButton>
@@ -1136,28 +1311,27 @@
             )}
 
             <CustomDialog open={showSuccess} onOpenChange={setShowSuccess}>
-              <div className="flex flex-col items-center gap-6">
-                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold flex items-center gap-3">
-                  <TrophyIcon className="text-accent-9" size={36} />
+              <div className="flex flex-col items-center gap-4 p-4">
+                <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 text-center">
+                  <TrophyIcon className="text-yellow-500" size={28} />
                   {currentStage < STAGES.length - 1
                     ? "Stage Complete!"
                     : "Game Complete!"}
                 </h2>
-                <p className="text-center text-base sm:text-lg md:text-xl lg:text-2xl">
+                <p className="text-center text-base text-gray-700">
                   {currentStage < STAGES.length - 1
                     ? "Congratulations! You've completed this stage!"
                     : "Amazing! You've completed all stages!"}
                 </p>
                 {currentStage < STAGES.length - 1 && (
-                  <div className="mt-6 flex justify-center">
+                  <div className="mt-4 flex justify-center">
                     <CustomButton
                       variant="primary"
-                      icon={<CaretRightIcon size={24} />}
+                      icon={<CaretRightIcon size={20} />}
                       onClick={advanceToNextStage}
+                      className="text-base"
                     >
-                      <span className="text-base sm:text-lg md:text-xl">
-                        Next Stage
-                      </span>
+                      Next Stage
                     </CustomButton>
                   </div>
                 )}
