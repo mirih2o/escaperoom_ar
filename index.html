@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>AR Puzzle Game</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts - Inter -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- AR.js for marker detection -->
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/aframe/build/aframe-ar.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/three.js/build/ar-threex-location-only.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/three.js/build/ar.min.js"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        margin: 0;
+        overflow: hidden; /* Prevent scrolling */
+      }
+      /* Custom styles to mimic Spark components or enhance appearance */
+      .dialog-overlay {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      .dialog-content {
+        background-color: #ffffff;
+        border-radius: 1rem;
+        padding: 2rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        max-width: 28rem; /* max-w-md */
+        width: 90%; /* w-11/12 */
+      }
+      .btn-primary {
+        background-color: #0d6efd; /* Bootstrap primary blue */
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        transition: background-color 0.2s ease-in-out;
+        min-height: 56px; /* Larger touch target size */
+        font-size: 1rem; /* Default to text-base */
+      }
+      .btn-primary:hover {
+        background-color: #0b5ed7;
+      }
+      .btn-primary:active {
+        background-color: #0a58ca;
+        transform: scale(0.95);
+      }
+      .btn-secondary {
+        background-color: #6c757d; /* Bootstrap secondary grey */
+        color: white;
+        padding: 0.75rem 1.25rem;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        transition: background-color 0.2s ease-in-out;
+        min-height: 56px; /* Larger touch target size */
+        min-width: 56px;
+        font-size: 0.875rem; /* Default to text-sm */
+      }
+      .btn-secondary:hover {
+        background-color: #5c636a;
+      }
+      .btn-secondary:active {
+        background-color: #495057;
+        transform: scale(0.95);
+      }
+
+      /* Responsive font sizes for different screen sizes */
+      @media (min-width: 640px) {
+        .btn-primary {
+          font-size: 1.125rem;
+          padding: 1.25rem 2.5rem;
+        } /* text-lg */
+        .btn-secondary {
+          font-size: 1rem;
+          padding: 1rem 1.5rem;
+        } /* text-base */
+      }
+
+      @media (min-width: 768px) {
+        .btn-primary {
+          font-size: 1.25rem;
+          padding: 1.5rem 3rem;
+        } /* text-xl */
+        .btn-secondary {
+          font-size: 1.125rem;
+          padding: 1.25rem 2rem;
+        } /* text-lg */
+      }
+      .text-accent-9 {
+        color: #6366f1; /* A shade of indigo, for accent */
+      }
+      .text-accent-11 {
+        color: #3730a3; /* A darker shade of indigo */
+      }
+      .bg-neutral-3 {
+        background-color: rgba(
+          229,
+          231,
+          235,
+          0.9
+        ); /* Light gray with some transparency */
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- React CDN -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"
+    ></script>
+    <!-- Babel CDN for JSX transformation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+      const { useState, useRef, useEffect } = React;
+      const { createRoot } = ReactDOM;
+
+      // Inline SVG Icons (Phosphor Icons replacements)
+      const TrophyIcon = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          fill="currentColor"
+          viewBox="0 0 256 256"
+          className={className}
+        >
+          <path d="M228,104a12.1,12.1,0,0,0-12,12V160a48,48,0,0,1-48,48H88a48,48,0,0,1-48-48V116a12.1,12.1,0,0,0-12-12,12,12,0,0,0,0,24v40a24,24,0,0,0,24,24h88a24,24,0,0,0,24-24V128a12,12,0,0,0,24,0v-12A12.1,12.1,0,0,0,228,104Zm-96-8A64,64,0,0,0,68,92V36a12,12,0,0,1,24,0V92a40,40,0,0,1,80,0V36a12,12,0,0,1,24,0V92A64,64,0,0,0,132,96Zm92-48a12,12,0,0,0-12-12H48a12,12,0,0,0,0,24H212A12,12,0,0,0,224,48Z"></path>
+        </svg>
+      );
+
+      const CameraIcon = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          fill="currentColor"
+          viewBox="0 0 256 256"
+          className={className}
+        >
+          <path d="M216,48H176L160,28A16,16,0,0,0,146.51,20H109.49A16,16,0,0,0,96,28L80,48H40A24,24,0,0,0,16,72V200a24,24,0,0,0,24,24H216a24,24,0,0,0,24-24V72A24,24,0,0,0,216,48ZM128,192a48,48,0,1,1,48-48A48.05,48.05,0,0,1,128,192Zm0-72a24,24,0,1,0,24,24A24,24,0,0,0,128,120Z"></path>
+        </svg>
+      );
+
+      const ArrowCounterClockwiseIcon = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          fill="currentColor"
+          viewBox="0 0 256 256"
+          className={className}
+        >
+          <path d="M224,128a96,96,0,0,1-192,0,12,12,0,0,1,24,0,72,72,0,1,0,144,0,12,12,0,0,1,24,0Zm-91.13,10.34a12,12,0,0,0,17.43-1.63L168,96.34V64a12,12,0,0,0-24,0V82.34L117.63,65.34a12,12,0,0,0-15.5,18.17l23.5,20Z"></path>
+        </svg>
+      );
+
+      const GridIcon = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          fill="currentColor"
+          viewBox="0 0 256 256"
+          className={className}
+        >
+          <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM112,200H40V144h72Zm0-72H40V72h72Zm24,72v-56h72V200Zm72-72H136V72h72Z"></path>
+        </svg>
+      );
+
+      const CaretRightIcon = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          fill="currentColor"
+          viewBox="0 0 256 256"
+          className={className}
+        >
+          <path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"></path>
+        </svg>
+      );
+
+      const LightbulbFilamentIcon = ({ size = 24, className = "" }) => (
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width={size}
+          height={size}
+          fill="currentColor"
+          viewBox="0 0 256 256"
+          className={className}
+        >
+          <path d="M128,24A96,96,0,0,0,51,180.3L40.7,208H215.3l-10.3-27.7A96,96,0,0,0,128,24Zm-4.1,137.9a12,12,0,0,1-16.1,4.4,12,12,0,0,1-4.4-16.1L121.9,128,107.4,98.6a12,12,0,0,1,4.4-16.1,12,12,0,0,1,16.1,4.4L134.1,128l14.5,29.4A12,12,0,0,1,123.9,161.9ZM168,208v16a8,8,0,0,1-16,0V208ZM88,208v16a8,8,0,0,1-16,0V208Z"></path>
+        </svg>
+      );
+
+      // Calculate grid cell size based on viewport
+      const GRID_SIZE = 3;
+      const TOLERANCE = 50; // Fixed tolerance value
+
+      // Define stages with their symbols and winning positions
+      const STAGES = [
+        {
+          symbols: {
+            flame: {
+              emoji: "🔥",
+              position: {
+                x: window.innerWidth * 0.35,
+                y: window.innerHeight * 0.15,
+              },
+              color: "#ff4400",
+              hint: "The flame burns brightest on the right",
+            },
+            gear: {
+              emoji: "⚙️",
+              position: {
+                x: window.innerWidth * 0.5,
+                y: window.innerHeight * 0.15,
+              },
+              color: "#888888",
+              hint: "The gear sits in a corner",
+            },
+            eye: {
+              emoji: "👁️",
+              position: {
+                x: window.innerWidth * 0.65,
+                y: window.innerHeight * 0.15,
+              },
+              color: "#00ffff",
+              hint: "The eye watches from above",
+            },
+          },
+          winningPositions: {
+            flame: { col: 2, row: 1 }, // Middle-right
+            gear: { col: 0, row: 2 }, // Bottom-left
+            eye: { col: 1, row: 0 }, // Top-center
+          },
+          neutralHints: {
+            hint: "Each column and row has 1 symbol",
+          },
+        },
+        {
+          symbols: {
+            flame: {
+              emoji: "🔥",
+              position: {
+                x: window.innerWidth * 0.35,
+                y: window.innerHeight * 0.15,
+              },
+              color: "#ff4400",
+              hint: "The flame glows from above",
+            },
+            gear: {
+              emoji: "⚙️",
+              position: {
+                x: window.innerWidth * 0.5,
+                y: window.innerHeight * 0.15,
+              },
+              color: "#888888",
+              hint: "The gear turns in harmony with others",
+            },
+            eye: {
+              emoji: "👁️",
+              position: {
+                x: window.innerWidth * 0.65,
+                y: window.innerHeight * 0.15,
+              },
+              color: "#00ffff",
+              hint: "The eye keeps balance in the center",
+            },
+            star: {
+              emoji: "⭐",
+              position: {
+                x: window.innerWidth * 0.35,
+                y: window.innerHeight * 0.05,
+              },
+              color: "#ffff00",
+              hint: "The star guides from the eastern edge",
+            },
+            moon: {
+              emoji: "🌙",
+              position: {
+                x: window.innerWidth * 0.5,
+                y: window.innerHeight * 0.05,
+              },
+              color: "#cccccc",
+              hint: "The moon reflects light from below",
+            },
+            sun: {
+              emoji: "☀️",
+              position: {
+                x: window.innerWidth * 0.65,
+                y: window.innerHeight * 0.05,
+              },
+              color: "#ffaa00",
+              hint: "The sun brings warmth to the west",
+            },
+          },
+          neutralHints: {
+            hint: "Arrange the symbols.",
+          },
+          winningPositions: {
+            flame: { col: 1, row: 0 }, // Top-center
+            gear: { col: 0, row: 1 }, // Middle-left
+            eye: { col: 1, row: 1 }, // Center
+            star: { col: 2, row: 1 }, // Middle-right
+            moon: { col: 1, row: 2 }, // Bottom-center
+            sun: { col: 0, row: 0 }, // Top-left
+          },
+        },
+      ];
+
+      function App() {
+        const [currentStage, setCurrentStage] = useState(0);
+        const [isARActive, setIsARActive] = useState(false);
+        const [arInitialized, setArInitialized] = useState(false);
+        const [showSuccess, setShowSuccess] = useState(false);
+        const [showGrid, setShowGrid] = useState(false);
+        const [showHints, setShowHints] = useState(false);
+        const [draggedSymbol, setDraggedSymbol] = useState(null);
+        const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 }); // Not currently used for symbol position
+        // Track which symbols have been discovered via AR markers
+        const [discoveredSymbols, setDiscoveredSymbols] = useState(new Set());
+        const [positions, setPositions] = useState(() =>
+          Object.fromEntries(
+            Object.entries(STAGES[0].symbols).map(([symbol, config]) => [
+              symbol,
+              { ...config.position },
+            ])
+          )
+        );
+
+        const [cellSize, setCellSize] = useState(0);
+        const [gridOffsetX, setGridOffsetX] = useState(0);
+        const [gridOffsetY, setGridOffsetY] = useState(0);
+
+        const videoRef = useRef(null);
+        const containerRef = useRef(null);
+        const arToolkitSourceRef = useRef(null);
+        const arToolkitContextRef = useRef(null);
+        const markerControlsRef = useRef({});
+
+        // AR marker detection function
+        const onMarkerDetected = (markerId) => {
+          // Map marker IDs to symbol names
+          const markerToSymbol = {
+            'eye': 'eye',
+            'flame': 'flame', 
+            'gear': 'gear'
+          };
+          
+          const symbolName = markerToSymbol[markerId];
+          if (symbolName && currentStage === 0) {
+            setDiscoveredSymbols(prev => new Set([...prev, symbolName]));
+          }
+        };
+
+        // Initialize AR.js when camera starts
+        const initializeAR = () => {
+          if (!videoRef.current) return;
+
+          // Create AR toolkit source
+          arToolkitSourceRef.current = new THREEx.ArToolkitSource({
+            sourceType: 'webcam',
+            sourceWidth: window.innerWidth,
+            sourceHeight: window.innerHeight,
+            displayWidth: window.innerWidth,
+            displayHeight: window.innerHeight,
+          });
+
+          arToolkitSourceRef.current.init(() => {
+            // Create AR toolkit context
+            arToolkitContextRef.current = new THREEx.ArToolkitContext({
+              cameraParametersUrl: 'https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.4.5/data/data/camera_para.dat',
+              detectionMode: 'mono_and_matrix',
+              matrixCodeType: '3x3',
+              canvasWidth: arToolkitSourceRef.current.parameters.sourceWidth,
+              canvasHeight: arToolkitSourceRef.current.parameters.sourceHeight,
+            });
+
+            arToolkitContextRef.current.init(() => {
+              // Setup markers for each pattern file
+              const markers = ['eye', 'flame', 'gear'];
+              
+              markers.forEach(markerId => {
+                const markerControls = new THREEx.ArMarkerControls(arToolkitContextRef.current, {}, {
+                  type: 'pattern',
+                  patternUrl: `./markers/${markerId}.patt`,
+                  changeMatrixMode: 'cameraTransformMatrix'
+                });
+
+                // Store reference and add event listeners
+                markerControlsRef.current[markerId] = markerControls;
+
+                // Listen for marker found/lost events
+                markerControls.addEventListener('markerFound', () => {
+                  console.log(`Marker ${markerId} found!`);
+                  onMarkerDetected(markerId);
+                });
+
+                markerControls.addEventListener('markerLost', () => {
+                  console.log(`Marker ${markerId} lost`);
+                });
+              });
+
+              // Start the AR render loop
+              startARRenderLoop();
+              
+              // Mark AR as initialized
+              setArInitialized(true);
+            });
+          });
+        };
+
+        // AR render loop
+        const startARRenderLoop = () => {
+          const animate = () => {
+            requestAnimationFrame(animate);
+            
+            if (arToolkitSourceRef.current && arToolkitContextRef.current) {
+              if (arToolkitSourceRef.current.ready) {
+                arToolkitContextRef.current.update(arToolkitSourceRef.current.domElement);
+              }
+            }
+          };
+          animate();
+        };
+
+        // Cleanup AR resources
+        const cleanupAR = () => {
+          if (arToolkitContextRef.current) {
+            arToolkitContextRef.current.dispose();
+            arToolkitContextRef.current = null;
+          }
+          if (arToolkitSourceRef.current) {
+            arToolkitSourceRef.current = null;
+          }
+          markerControlsRef.current = {};
+          setArInitialized(false);
+        };
+
+        // Effect to reveal grid when all symbols are discovered in stage 1
+        useEffect(() => {
+          if (currentStage === 0 && discoveredSymbols.size === 3) {
+            setShowGrid(true);
+          }
+        }, [discoveredSymbols, currentStage]);
+
+        // Cleanup AR resources on unmount
+        useEffect(() => {
+          return () => {
+            cleanupAR();
+          };
+        }, []);
+
+        // Update grid dimensions on window resize
+        useEffect(() => {
+          const updateGridDimensions = () => {
+            // Better mobile-friendly sizing with larger cells for bigger symbols
+            const padding = 100; // More space for UI elements
+            const availableWidth = window.innerWidth - padding;
+            const availableHeight = window.innerHeight - padding;
+            const minDimension = Math.min(availableWidth, availableHeight);
+            const newCellSize = Math.max(80, minDimension / 3.5); // Larger minimum cell size for bigger symbols
+            setCellSize(newCellSize);
+            setGridOffsetX(
+              window.innerWidth / 2 - (GRID_SIZE * newCellSize) / 2
+            );
+            setGridOffsetY(
+              window.innerHeight / 2 - (GRID_SIZE * newCellSize) / 2
+            );
+          };
+
+          updateGridDimensions();
+          window.addEventListener("resize", updateGridDimensions);
+          // Also update on orientation change for mobile
+          window.addEventListener("orientationchange", () => {
+            setTimeout(updateGridDimensions, 100);
+          });
+
+          return () => {
+            window.removeEventListener("resize", updateGridDimensions);
+            window.removeEventListener(
+              "orientationchange",
+              updateGridDimensions
+            );
+          };
+        }, []);
+
+        // Convert grid position to pixel coordinates
+        const gridToPixel = (col, row) => ({
+          x: gridOffsetX + (col + 0.5) * cellSize,
+          y: gridOffsetY + (row + 0.5) * cellSize,
+        });
+
+        // Convert pixel coordinates to grid position
+        const pixelToGrid = (x, y) => ({
+          col: Math.floor((x - gridOffsetX) / cellSize),
+          row: Math.floor((y - gridOffsetY) / cellSize),
+        });
+
+        const getEventCoordinates = (e) => {
+          const touch = e.touches?.[0] || e.changedTouches?.[0];
+          return {
+            clientX: touch?.clientX || e.clientX,
+            clientY: touch?.clientY || e.clientY,
+          };
+        };
+
+        const handlePointerMove = (e) => {
+          const container = containerRef.current.getBoundingClientRect();
+          const { clientX, clientY } = getEventCoordinates(e);
+          const x = clientX - container.left;
+          const y = clientY - container.top;
+          setCursorPosition({ x, y });
+        };
+
+        const handleDragStart = (e, symbol) => {
+          e.preventDefault();
+          setDraggedSymbol(symbol);
+        };
+
+        const startAR = async () => {
+          try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: "environment" },
+            });
+
+            if (videoRef.current) {
+              videoRef.current.srcObject = stream;
+              videoRef.current.play();
+              setIsARActive(true);
+              
+              // Initialize AR marker detection after a short delay
+              setTimeout(() => {
+                initializeAR();
+              }, 1000);
+            }
+          } catch (error) {
+            console.error("Error accessing camera:", error);
+            // Provide a user-friendly message instead of alert
+            const messageBox = document.createElement("div");
+            messageBox.className =
+              "fixed inset-0 flex items-center justify-center z-[100] dialog-overlay";
+            messageBox.innerHTML = `
+                        <div class="dialog-content text-center">
+                            <h2 class="text-xl sm:text-2xl md:text-3xl font-semibold mb-6">Camera Access Denied</h2>
+                            <p class="text-base sm:text-lg md:text-xl mb-6">Please allow camera access to start the AR experience.</p>
+                            <button class="mt-6 px-6 py-3 bg-blue-500 text-white rounded-lg text-base sm:text-lg md:text-xl hover:bg-blue-600 transition-colors font-medium" onclick="this.parentElement.parentElement.remove()">OK</button>
+                        </div>
+                    `;
+            document.body.appendChild(messageBox);
+          }
+        };
+
+        const checkWinCondition = () => {
+          let isWin = true;
+          const currentWinningPositions = STAGES[currentStage].winningPositions;
+
+          Object.entries(positions).forEach(([symbol, position]) => {
+            const target = currentWinningPositions[symbol];
+            if (!target) {
+              // Handle cases where a symbol might not have a winning position in the current stage
+              isWin = false;
+              return;
+            }
+            const targetPixel = gridToPixel(target.col, target.row);
+            const distance = Math.sqrt(
+              Math.pow(targetPixel.x - position.x, 2) +
+                Math.pow(targetPixel.y - position.y, 2)
+            );
+
+            if (distance > TOLERANCE) {
+              isWin = false;
+            }
+          });
+
+          if (isWin) {
+            setShowSuccess(true);
+          }
+        };
+
+        const advanceToNextStage = () => {
+          if (currentStage < STAGES.length - 1) {
+            const nextStageIndex = currentStage + 1;
+            setCurrentStage(nextStageIndex);
+            // Reset positions for the new stage symbols
+            setPositions(
+              Object.fromEntries(
+                Object.entries(STAGES[nextStageIndex].symbols).map(
+                  ([symbol, config]) => [symbol, { ...config.position }]
+                )
+              )
+            );
+            setShowSuccess(false);
+            setShowHints(false); // Hide hints for new stage
+            // Reset AR discovery for the new stage
+            setDiscoveredSymbols(new Set());
+            // For stages other than 1, show grid by default
+            if (nextStageIndex !== 0) {
+              setShowGrid(true);
+            } else {
+              setShowGrid(false);
+            }
+          }
+        };
+
+        const resetPositions = () => {
+          setPositions(
+            Object.fromEntries(
+              Object.entries(STAGES[currentStage].symbols).map(
+                ([symbol, config]) => [symbol, { ...config.position }]
+              )
+            )
+          );
+        };
+
+        const snapToGrid = (x, y) => {
+          // Calculate which grid cell we're closest to
+          const col = Math.floor((x - gridOffsetX) / cellSize);
+          const row = Math.floor((y - gridOffsetY) / cellSize);
+
+          // Only snap if within grid bounds
+          if (col >= 0 && col < GRID_SIZE && row >= 0 && row < GRID_SIZE) {
+            return gridToPixel(col, row);
+          }
+
+          // Return original position if not within grid
+          return { x, y };
+        };
+
+        const handleDrag = (e) => {
+          if (!draggedSymbol) return;
+          e.preventDefault();
+
+          const container = containerRef.current.getBoundingClientRect();
+          const { clientX, clientY } = getEventCoordinates(e);
+          const x = clientX - container.left;
+          const y = clientY - container.top;
+
+          // Check if within grid bounds for snapping
+          const col = Math.floor((x - gridOffsetX) / cellSize);
+          const row = Math.floor((y - gridOffsetY) / cellSize);
+
+          if (col >= 0 && col < GRID_SIZE && row >= 0 && row < GRID_SIZE) {
+            const snappedPos = snapToGrid(x, y);
+            setPositions((prev) => ({
+              ...prev,
+              [draggedSymbol]: snappedPos,
+            }));
+          } else {
+            // Follow cursor if not within grid
+            setPositions((prev) => ({
+              ...prev,
+              [draggedSymbol]: { x, y },
+            }));
+          }
+        };
+
+        const handleDragEnd = () => {
+          if (!draggedSymbol) return;
+
+          const currentPos = positions[draggedSymbol];
+          const gridPos = pixelToGrid(currentPos.x, currentPos.y);
+
+          // Check if the cell is within grid bounds
+          if (
+            gridPos.col >= 0 &&
+            gridPos.col < GRID_SIZE &&
+            gridPos.row >= 0 &&
+            gridPos.row < GRID_SIZE
+          ) {
+            // Check if any other symbol is in this cell
+            const occupyingSymbol = Object.entries(positions).find(
+              ([symbol, pos]) => {
+                if (symbol === draggedSymbol) return false;
+                const otherGridPos = pixelToGrid(pos.x, pos.y);
+                return (
+                  otherGridPos.col === gridPos.col &&
+                  otherGridPos.row === gridPos.row
+                );
+              }
+            );
+
+            // If cell is occupied, send the other symbol back to its original position
+            if (occupyingSymbol) {
+              const [symbol] = occupyingSymbol;
+              setPositions((prev) => ({
+                ...prev,
+                [symbol]: { ...STAGES[currentStage].symbols[symbol].position },
+              }));
+            }
+          }
+
+          setDraggedSymbol(null);
+          checkWinCondition();
+        };
+
+        // Custom Dialog component replacement
+        const CustomDialog = ({ open, onOpenChange, children }) => {
+          if (!open) return null;
+          return (
+            <div
+              className="fixed inset-0 flex items-center justify-center z-50 dialog-overlay"
+              onClick={() => onOpenChange(false)}
+            >
+              <div
+                className="dialog-content"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {children}
+              </div>
+            </div>
+          );
+        };
+
+        // Custom Button component replacement
+        const CustomButton = ({
+          variant,
+          icon,
+          onClick,
+          children,
+          "aria-label": ariaLabel,
+        }) => {
+          const baseClasses =
+            "flex items-center justify-center gap-2 rounded-md font-medium transition-colors duration-200";
+          const variantClasses = {
+            primary: "btn-primary",
+            secondary: "btn-secondary",
+          };
+
+          return (
+            <button
+              className={`${baseClasses} ${variantClasses[variant]}`}
+              onClick={onClick}
+              aria-label={ariaLabel}
+            >
+              {icon}
+              {children}
+            </button>
+          );
+        };
+
+        return (
+          <div
+            className="w-full h-screen relative overflow-hidden"
+            ref={containerRef}
+            onDragOver={(e) => e.preventDefault()}
+            onMouseMove={handlePointerMove}
+            onTouchMove={handlePointerMove}
+            style={{ touchAction: "none" }}
+          >
+            <video
+              ref={videoRef}
+              className="w-full h-full object-cover"
+              playsInline
+              muted
+              hidden={!isARActive}
+            />
+
+            {showGrid &&
+              cellSize >
+                0 /* Ensure cellSize is calculated before rendering grid */ && (
+                <div
+                  className="absolute grid grid-cols-3 grid-rows-3"
+                  style={{
+                    width: GRID_SIZE * cellSize,
+                    height: GRID_SIZE * cellSize,
+                    left: gridOffsetX,
+                    top: gridOffsetY,
+                  }}
+                >
+                  {Array.from({ length: 9 }).map((_, i) => (
+                    <div key={i} className="border-4 border-white/40" />
+                  ))}
+                </div>
+              )}
+
+            {Object.entries(STAGES[currentStage].symbols)
+              .filter(([symbol]) => {
+                // In stage 1, only show symbols that have been discovered via AR markers
+                return currentStage !== 0 || discoveredSymbols.has(symbol);
+              })
+              .map(([symbol, config]) => (
+                <div
+                  key={symbol}
+                  className="absolute cursor-move text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl select-none touch-none"
+                  style={{
+                    left: positions[symbol].x,
+                    top: positions[symbol].y,
+                    transform: "translate(-50%, -50%)",
+                    zIndex: draggedSymbol === symbol ? 10 : 5, // Bring dragged symbol to front
+                    filter:
+                      draggedSymbol === symbol
+                        ? "drop-shadow(0 4px 8px rgba(0,0,0,0.3))"
+                        : "none",
+                    transition:
+                      draggedSymbol === symbol ? "none" : "all 0.2s ease",
+                  }}
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, symbol)}
+                  onDrag={handleDrag}
+                  onDragEnd={handleDragEnd}
+                  onTouchStart={(e) => handleDragStart(e, symbol)}
+                  onTouchMove={handleDrag}
+                  onTouchEnd={handleDragEnd}
+                >
+                  {config.emoji}
+                </div>
+              )
+            )}
+
+            {showHints && (
+              <div className="absolute bottom-20 sm:bottom-24 left-4 right-4 bg-neutral-3 p-3 sm:p-4 rounded-xl max-w-sm sm:max-w-md mx-auto z-20 leading-tight">
+                <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-2 flex items-center gap-3 leading-tight">
+                  <LightbulbFilamentIcon className="text-accent-9" size={24} />
+                  Hints
+                </h3>
+                {STAGES[currentStage].neutralHints?.hint && (
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl mb-2 leading-tight">
+                    {STAGES[currentStage].neutralHints.hint}
+                  </p>
+                )}
+                {Object.entries(STAGES[currentStage].symbols)
+                  .filter(([symbol]) => {
+                    // In stage 1, only show hints for symbols that have been discovered via AR markers
+                    return currentStage !== 0 || discoveredSymbols.has(symbol);
+                  })
+                  .map(([symbol, config]) => (
+                    <p
+                      key={symbol}
+                      className="text-sm sm:text-base md:text-lg lg:text-xl mb-2 leading-tight"
+                    >
+                      <span className="mr-3 text-lg sm:text-xl md:text-2xl lg:text-3xl">
+                        {config.emoji}
+                      </span>
+                      {config.hint}
+                    </p>
+                  )
+                )}
+              </div>
+            )}
+
+            {!isARActive && (
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <div className="text-center">
+                  <CustomButton
+                    variant="primary"
+                    icon={<CameraIcon size={28} />}
+                    onClick={startAR}
+                  >
+                    <span className="text-base sm:text-lg md:text-xl lg:text-2xl">
+                      Start AR Experience
+                    </span>
+                  </CustomButton>
+                  <p className="mt-4 text-sm sm:text-base md:text-lg text-gray-700 max-w-md mx-auto">
+                    Find and scan AR markers to discover hidden symbols and unlock the puzzle grid
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* AR Scanning Instructions for Stage 1 */}
+            {isARActive && currentStage === 0 && discoveredSymbols.size < 3 && (
+              <div className="absolute top-4 left-4 right-4 bg-neutral-3 p-3 rounded-xl z-20">
+                <div className="text-center">
+                  <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-accent-11 mb-2">
+                    {arInitialized ? 'Scan AR Markers to Discover Symbols' : 'Initializing AR System...'}
+                  </h3>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-neutral-11 mb-2">
+                    {arInitialized 
+                      ? 'Point your camera at AR markers to reveal the symbols'
+                      : 'Please wait while we set up marker detection...'
+                    }
+                  </p>
+                  {arInitialized && (
+                    <>
+                      <div className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-accent-11">
+                        Found: {discoveredSymbols.size}/3 symbols
+                      </div>
+                      <div className="flex justify-center gap-2 mt-2">
+                        {['eye', 'flame', 'gear'].map((symbol) => (
+                          <span
+                            key={symbol}
+                            className={`text-xl sm:text-2xl md:text-3xl transition-opacity ${
+                              discoveredSymbols.has(symbol) ? 'opacity-100' : 'opacity-30'
+                            }`}
+                          >
+                            {symbol === 'eye' ? '👁️' : symbol === 'flame' ? '🔥' : '⚙️'}
+                          </span>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                  {!arInitialized && (
+                    <div className="flex justify-center mt-2">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent-11"></div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Grid revealed message for Stage 1 */}
+            {isARActive && currentStage === 0 && discoveredSymbols.size === 3 && showGrid && (
+              <div className="absolute top-4 left-4 right-4 bg-green-600 p-3 rounded-xl z-20">
+                <div className="text-center">
+                  <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white mb-1">
+                    All Symbols Found!
+                  </h3>
+                  <p className="text-sm sm:text-base md:text-lg text-white">
+                    The grid is now revealed. Drag symbols to solve the puzzle.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {isARActive && (
+              <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-2 z-20">
+                {/* Development/Fallback AR testing buttons */}
+                {currentStage === 0 && (
+                  <div className="bg-yellow-100 p-2 rounded-xl border-2 border-yellow-300">
+                    <div className="text-center text-xs text-yellow-800 mb-2 font-semibold">
+                      🔧 FALLBACK MODE - Manual Symbol Discovery
+                    </div>
+                    <div className="text-center text-xs text-yellow-700 mb-2">
+                      (Use these if AR marker detection isn't working)
+                    </div>
+                    <div className="flex justify-center gap-2">
+                      {['eye', 'flame', 'gear'].map((symbol) => (
+                        <button
+                          key={symbol}
+                          onClick={() => onMarkerDetected(symbol)}
+                          disabled={discoveredSymbols.has(symbol)}
+                          className={`px-3 py-2 text-sm rounded-lg font-medium transition-colors ${
+                            discoveredSymbols.has(symbol)
+                              ? 'bg-green-200 text-green-800 cursor-not-allowed'
+                              : 'bg-blue-200 text-blue-800 hover:bg-blue-300 cursor-pointer'
+                          }`}
+                        >
+                          {symbol === 'eye' ? '👁️' : symbol === 'flame' ? '🔥' : '⚙️'} {symbol}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex flex-row justify-between items-center bg-neutral-3 p-2 sm:p-3 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm sm:text-base md:text-lg lg:text-xl text-accent-11 font-medium">
+                      Stage {currentStage + 1}/{STAGES.length}
+                    </span>
+                  </div>
+                  <div className="flex flex-row gap-2 items-center">
+                  <CustomButton
+                    variant="secondary"
+                    icon={<LightbulbFilamentIcon size={20} />}
+                    onClick={() => setShowHints(!showHints)}
+                    aria-label="Toggle hints"
+                  >
+                    <span className="hidden sm:inline text-sm sm:text-base md:text-lg">
+                      Hints
+                    </span>
+                  </CustomButton>
+                  <CustomButton
+                    variant="secondary"
+                    icon={<GridIcon size={20} />}
+                    onClick={() => setShowGrid(!showGrid)}
+                    aria-label="Toggle grid"
+                  >
+                    <span className="hidden sm:inline text-sm sm:text-base md:text-lg">
+                      Grid
+                    </span>
+                  </CustomButton>
+                  <CustomButton
+                    variant="secondary"
+                    icon={<ArrowCounterClockwiseIcon size={20} />}
+                    onClick={resetPositions}
+                    aria-label="Reset positions"
+                  >
+                    <span className="hidden sm:inline text-sm sm:text-base md:text-lg">
+                      Reset
+                    </span>
+                  </CustomButton>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <CustomDialog open={showSuccess} onOpenChange={setShowSuccess}>
+              <div className="flex flex-col items-center gap-6">
+                <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold flex items-center gap-3">
+                  <TrophyIcon className="text-accent-9" size={36} />
+                  {currentStage < STAGES.length - 1
+                    ? "Stage Complete!"
+                    : "Game Complete!"}
+                </h2>
+                <p className="text-center text-base sm:text-lg md:text-xl lg:text-2xl">
+                  {currentStage < STAGES.length - 1
+                    ? "Congratulations! You've completed this stage!"
+                    : "Amazing! You've completed all stages!"}
+                </p>
+                {currentStage < STAGES.length - 1 && (
+                  <div className="mt-6 flex justify-center">
+                    <CustomButton
+                      variant="primary"
+                      icon={<CaretRightIcon size={24} />}
+                      onClick={advanceToNextStage}
+                    >
+                      <span className="text-base sm:text-lg md:text-xl">
+                        Next Stage
+                      </span>
+                    </CustomButton>
+                  </div>
+                )}
+              </div>
+            </CustomDialog>
+          </div>
+        );
+      }
+
+      const root = createRoot(document.getElementById("root"));
+      root.render(<App />);
+    </script>
+  </body>
+</html>
