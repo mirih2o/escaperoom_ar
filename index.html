@@ -1111,13 +1111,13 @@
             {showHints && (
               <div className="fixed left-2 right-2 z-20" style={{ bottom: '100px' }}>
                 <div className="bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 max-w-md mx-auto">
-                  <div className="text-center text-sm text-gray-800 font-medium mb-1">
-                    <LightbulbFilamentIcon className="text-yellow-500 inline mr-1" size={16} />
+                  <div className="text-center text-base font-medium mb-2 text-gray-800">
+                    <LightbulbFilamentIcon className="text-yellow-500 inline mr-1" size={18} />
                     Puzzle Hints
                   </div>
-                  <div className="text-xs text-gray-600 space-y-1">
+                  <div className="text-sm text-gray-600 space-y-2">
                     {STAGES[currentStage].neutralHints?.hint && (
-                      <div className="text-center mb-2">
+                      <div className="text-center mb-3 font-medium">
                         {STAGES[currentStage].neutralHints.hint}
                       </div>
                     )}
@@ -1129,9 +1129,9 @@
                       .map(([symbol, config]) => (
                         <div
                           key={symbol}
-                          className="flex items-center gap-2"
+                          className="flex items-center gap-3"
                         >
-                          <span className="text-sm">
+                          <span className="text-base">
                             {config.emoji}
                           </span>
                           <span>
@@ -1148,16 +1148,16 @@
             {!isARActive && (
               <div className="absolute inset-0 flex items-center justify-center z-10 bg-gradient-to-br from-blue-50 to-indigo-100">
                 <div className="text-center p-6 bg-white rounded-xl shadow-lg border border-gray-200 max-w-sm mx-4">
-                  <h2 className="text-xl font-semibold text-gray-800 mb-3">AR Puzzle Game</h2>
+                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">AR Puzzle Game</h2>
                   <CustomButton
                     variant="primary"
-                    icon={<CameraIcon size={20} />}
+                    icon={<CameraIcon size={22} />}
                     onClick={startAR}
                     className="w-full"
                   >
                     Start AR Experience
                   </CustomButton>
-                  <p className="mt-3 text-sm text-gray-600">
+                  <p className="mt-4 text-base text-gray-600">
                     Find and scan AR markers to discover hidden symbols and unlock the puzzle grid
                   </p>
                 </div>
@@ -1166,12 +1166,12 @@
 
             {/* AR Scanning Instructions for Stage 1 */}
             {isARActive && currentStage === 0 && discoveredSymbols.size < 3 && (
-              <div className="fixed top-2 left-2 right-2 bg-white/95 backdrop-blur-sm p-3 rounded-lg z-20 shadow-lg border border-gray-200 max-w-md mx-auto">
+              <div className="fixed top-2 left-2 right-2 bg-white/95 backdrop-blur-sm p-4 rounded-lg z-20 shadow-lg border border-gray-200 max-w-md mx-auto">
                 <div className="text-center">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
                     {arError ? '⚠️ Using Manual Mode' : arInitialized ? '🔍 Find Hidden Symbols' : '📷 Starting Camera...'}
                   </h3>
-                  <p className="text-xs sm:text-sm text-gray-600 mb-2">
+                  <p className="text-sm sm:text-base text-gray-600 mb-3">
                     {arError ? 'Camera ready - Use manual buttons below' : arInitialized 
                       ? 'Point camera at markers or tap buttons below'
                       : 'Setting up detection...'
@@ -1179,15 +1179,15 @@
                   </p>
                   {arInitialized && (
                     <>
-                      <div className="flex justify-center items-center gap-3 mb-2">
-                        <span className="text-sm font-medium text-gray-700">
+                      <div className="flex justify-center items-center gap-4 mb-3">
+                        <span className="text-base font-medium text-gray-700">
                           {discoveredSymbols.size}/3
                         </span>
-                        <div className="flex gap-1">
+                        <div className="flex gap-2">
                           {['eye', 'flame', 'gear'].map((symbol) => (
                             <span
                               key={symbol}
-                              className={`text-lg transition-all duration-300 ${
+                              className={`text-xl transition-all duration-300 ${
                                 discoveredSymbols.has(symbol) 
                                   ? 'opacity-100 scale-110' 
                                   : 'opacity-20 scale-90'
@@ -1198,18 +1198,18 @@
                           ))}
                         </div>
                       </div>
-                      <div className="flex items-center justify-center gap-1 text-green-600 text-xs">
-                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                      <div className="flex items-center justify-center gap-1 text-green-600 text-sm">
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                         AR Active
                       </div>
                     </>
                   )}
                   {!arInitialized && (
-                    <div className="flex justify-center items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-b-transparent border-blue-600"></div>
+                    <div className="flex justify-center items-center gap-3">
+                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-b-transparent border-blue-600"></div>
                       <button
                         onClick={() => setArInitialized(true)}
-                        className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                        className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                       >
                         Skip
                       </button>
@@ -1222,15 +1222,15 @@
             {/* Grid revealed message for Stage 1 */}
             {isARActive && currentStage === 0 && discoveredSymbols.size === 3 && showGrid && (
               <div 
-                className={`fixed top-20 left-2 right-2 bg-green-50 border border-green-200 p-3 rounded-lg z-20 shadow-lg max-w-md mx-auto transition-opacity duration-1000 ${
+                className={`fixed top-20 left-2 right-2 bg-green-50 border border-green-200 p-4 rounded-lg z-20 shadow-lg max-w-md mx-auto transition-opacity duration-1000 ${
                   showAllSymbolsFoundMessage ? 'opacity-100' : 'opacity-0'
                 }`}
               >
                 <div className="text-center">
-                  <h3 className="text-base font-semibold text-green-800 mb-1 flex items-center justify-center gap-2">
+                  <h3 className="text-lg font-semibold text-green-800 mb-2 flex items-center justify-center gap-2">
                     ✅ All Symbols Found!
                   </h3>
-                  <p className="text-sm text-green-700">
+                  <p className="text-base text-green-700">
                     Drag symbols to solve the puzzle.
                   </p>
                 </div>
@@ -1242,7 +1242,7 @@
                 {/* Development/Fallback AR testing buttons */}
                 {currentStage === 0 && discoveredSymbols.size < 3 && (
                   <div className="bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 mb-2 max-w-md mx-auto">
-                    <div className="text-center text-sm text-gray-800 font-medium mb-1">
+                    <div className="text-center text-base text-gray-800 font-medium mb-2">
                       Tap if AR scanning doesn't work
                     </div>
                     <div className="flex justify-center gap-2 flex-wrap">
@@ -1251,7 +1251,7 @@
                           key={symbol}
                           onClick={() => onMarkerDetected(symbol)}
                           disabled={discoveredSymbols.has(symbol)}
-                          className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex-shrink-0 ${
+                          className={`px-4 py-3 rounded-lg text-sm font-medium transition-all flex-shrink-0 ${
                             discoveredSymbols.has(symbol)
                               ? 'bg-green-100 text-green-800 cursor-not-allowed'
                               : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
@@ -1266,41 +1266,41 @@
 
                 <div className="flex flex-row justify-between items-center bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 max-w-md mx-auto">
                   <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-gray-800">
+                    <span className="text-base font-semibold text-gray-800">
                       Stage {currentStage + 1}/{STAGES.length}
                     </span>
                   </div>
                   <div className="flex flex-row gap-1 sm:gap-2 items-center">
                   <CustomButton
                     variant="secondary"
-                    icon={<LightbulbFilamentIcon size={16} />}
+                    icon={<LightbulbFilamentIcon size={18} />}
                     onClick={() => setShowHints(!showHints)}
                     aria-label="Toggle hints"
-                    className="text-xs px-2 py-2 min-w-10"
+                    className="text-sm px-3 py-2 min-w-12"
                   >
-                    <span className="hidden sm:inline text-xs">
+                    <span className="hidden sm:inline text-sm">
                       Hints
                     </span>
                   </CustomButton>
                   <CustomButton
                     variant="secondary"
-                    icon={<GridIcon size={16} />}
+                    icon={<GridIcon size={18} />}
                     onClick={() => setShowGrid(!showGrid)}
                     aria-label="Toggle grid"
-                    className="text-xs px-2 py-2 min-w-10"
+                    className="text-sm px-3 py-2 min-w-12"
                   >
-                    <span className="hidden sm:inline text-xs">
+                    <span className="hidden sm:inline text-sm">
                       Grid
                     </span>
                   </CustomButton>
                   <CustomButton
                     variant="secondary"
-                    icon={<ArrowCounterClockwiseIcon size={16} />}
+                    icon={<ArrowCounterClockwiseIcon size={18} />}
                     onClick={resetPositions}
                     aria-label="Reset positions"
-                    className="text-xs px-2 py-2 min-w-10"
+                    className="text-sm px-3 py-2 min-w-12"
                   >
-                    <span className="hidden sm:inline text-xs">
+                    <span className="hidden sm:inline text-sm">
                       Reset
                     </span>
                   </CustomButton>
