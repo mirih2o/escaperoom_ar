@@ -588,6 +588,7 @@
         const [showAllSymbolsFoundMessage, setShowAllSymbolsFoundMessage] =
           useState(false);
         const [showFallbackButtons, setShowFallbackButtons] = useState(false);
+        const [fallbackMinimized, setFallbackMinimized] = useState(false);
         const [debugMode, setDebugMode] = useState(() => {
           // Check if debug mode was previously enabled
           const savedDebugMode = localStorage.getItem("arPuzzleDebugMode");
@@ -1560,7 +1561,7 @@
                               className={`text-lg transition-all duration-300 ${
                                 discoveredSymbols.has(symbol)
                                   ? "opacity-100 scale-110"
-                                  : "opacity-20 scale-90"
+                                  : "opacity-10 scale-90"
                               }`}
                               style={{
                                 color: discoveredSymbols.has(symbol)
@@ -1632,7 +1633,7 @@
                   <>
                     {/* AR not working prompt */}
                     {!showFallbackButtons && (
-                      <div className="message-box mb-2 text-center">
+                      <div className="message-box mb-2 p-1 text-center">
                         <div className="flex items-center justify-center gap-2">
                           <span className="text-body">AR not working?</span>
                           <CustomButton
@@ -1645,38 +1646,52 @@
                         </div>
                       </div>
                     )}
-
                     {/* Fallback buttons - only show when requested */}
                     {showFallbackButtons && (
                       <div className="message-box mb-2">
-                        <div className="text-subtitle text-center mb-1">
-                          Tap to discover symbols manually
+                        <div className="flex justify-between items-center">
+                          <div className="text-subtitle mb-1">
+                            {!fallbackMinimized
+                              ? "Tap to discover symbols manually"
+                              : "Manual Discovery"}
+                          </div>
+                          <button
+                            onClick={() =>
+                              setFallbackMinimized(!fallbackMinimized)
+                            }
+                            className="text-xs px-2 py-1 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors"
+                          >
+                            {fallbackMinimized ? "Expand" : "Minimize"}
+                          </button>
                         </div>
-                        <div className="flex justify-center gap-2 flex-wrap">
-                          {["eye", "flame", "gear"].map((symbol) => (
-                            <button
-                              key={symbol}
-                              onClick={() => onMarkerDetected(symbol)}
-                              disabled={discoveredSymbols.has(symbol)}
-                              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex-shrink-0 ${
-                                discoveredSymbols.has(symbol)
-                                  ? "bg-green-100 cursor-not-allowed"
-                                  : "btn-secondary"
-                              }`}
-                              style={{
-                                color: discoveredSymbols.has(symbol)
-                                  ? "var(--text-success)"
-                                  : `var(--color-symbol-${symbol})`,
-                              }}
-                            >
-                              {symbol === "eye"
-                                ? "👁️ Eye"
-                                : symbol === "flame"
-                                ? "🔥 Flame"
-                                : "⚙️ Gear"}
-                            </button>
-                          ))}
-                        </div>
+
+                        {!fallbackMinimized && (
+                          <div className="flex justify-center gap-2 flex-wrap mt-2">
+                            {["eye", "flame", "gear"].map((symbol) => (
+                              <button
+                                key={symbol}
+                                onClick={() => onMarkerDetected(symbol)}
+                                disabled={discoveredSymbols.has(symbol)}
+                                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex-shrink-0 ${
+                                  discoveredSymbols.has(symbol)
+                                    ? "bg-green-100 cursor-not-allowed"
+                                    : "btn-secondary"
+                                }`}
+                                style={{
+                                  color: discoveredSymbols.has(symbol)
+                                    ? "var(--text-success)"
+                                    : `var(--color-symbol-${symbol})`,
+                                }}
+                              >
+                                {symbol === "eye"
+                                  ? "👁️ Eye"
+                                  : symbol === "flame"
+                                  ? "🔥 Flame"
+                                  : "⚙️ Gear"}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </>
