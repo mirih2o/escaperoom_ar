@@ -186,6 +186,7 @@
 
       .icon-align-text-bottom {
         vertical-align: text-bottom;
+        display: inline-block;
       }
 
       .trophy-icon {
@@ -371,9 +372,12 @@
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          width={size}
+          height={size}
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6"
+          className={className}
+          style={{ display: "inline-block" }}
         >
           <path
             stroke-linecap="round"
@@ -388,9 +392,12 @@
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          width={size}
+          height={size}
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6"
+          className={className}
+          style={{ display: "inline-block" }}
         >
           <path
             stroke-linecap="round"
@@ -410,9 +417,12 @@
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          width={size}
+          height={size}
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6"
+          className={className}
+          style={{ display: "inline-block" }}
         >
           <path
             stroke-linecap="round"
@@ -427,9 +437,12 @@
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          width={size}
+          height={size}
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6"
+          className={className}
+          style={{ display: "inline-block" }}
         >
           <path
             stroke-linecap="round"
@@ -444,9 +457,12 @@
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          width={size}
+          height={size}
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6"
+          className={className}
+          style={{ display: "inline-block" }}
         >
           <path
             stroke-linecap="round"
@@ -461,9 +477,12 @@
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
+          width={size}
+          height={size}
           stroke-width="1.5"
           stroke="currentColor"
-          class="size-6"
+          className={className}
+          style={{ display: "inline-block" }}
         >
           <path
             stroke-linecap="round"
@@ -1428,11 +1447,9 @@
                   <div className="paper-note-tape"></div>
                   <div className="paper-note-title">
                     <LightbulbFilamentIcon
-                      className="inline mr-1 icon-align-text-bottom"
+                      className="mr-4"
                       size={18}
-                    />
-                    Puzzle Hints
-                  </div>
+                    />Puzzle Hints</div>
                   <div className="hint-content">
                     {STAGES[currentStage].neutralHints?.hint && (
                       <div className="hint-text">
