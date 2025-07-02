@@ -588,6 +588,11 @@
         const [showAllSymbolsFoundMessage, setShowAllSymbolsFoundMessage] =
           useState(false);
         const [showFallbackButtons, setShowFallbackButtons] = useState(false);
+        const [debugMode, setDebugMode] = useState(() => {
+          // Check if debug mode was previously enabled
+          const savedDebugMode = localStorage.getItem("arPuzzleDebugMode");
+          return savedDebugMode === "true";
+        });
 
         const [cellSize, setCellSize] = useState(0);
         const [gridOffsetX, setGridOffsetX] = useState(0);
@@ -809,6 +814,24 @@
 
           setArInitialized(false);
         };
+
+        // Effect to activate debug mode with Shift+Alt+D
+        // This adds the Grid button
+        useEffect(() => {
+          const handleKeyDown = (e) => {
+            // Shift+Alt+D to toggle debug mode
+            if (e.shiftKey && e.altKey && e.key.toLowerCase() === "d") {
+              const newDebugMode = !debugMode;
+              setDebugMode(newDebugMode);
+              // Store debug mode in localStorage
+              localStorage.setItem("arPuzzleDebugMode", newDebugMode);
+              console.log("Debug mode:", newDebugMode);
+            }
+          };
+
+          window.addEventListener("keydown", handleKeyDown);
+          return () => window.removeEventListener("keydown", handleKeyDown);
+        }, [debugMode]); // Keep debugMode in the dependency array
 
         // Effect to reveal grid when all symbols are discovered in stage 1
         useEffect(() => {
@@ -1446,10 +1469,9 @@
                 <div className="paper-note">
                   <div className="paper-note-tape"></div>
                   <div className="paper-note-title">
-                    <LightbulbFilamentIcon
-                      className="mr-4"
-                      size={18}
-                    />Puzzle Hints</div>
+                    <LightbulbFilamentIcon className="mr-4" size={18} />
+                    Puzzle Hints
+                  </div>
                   <div className="hint-content">
                     {STAGES[currentStage].neutralHints?.hint && (
                       <div className="hint-text">
@@ -1674,17 +1696,21 @@
                       aria-label="Toggle hints"
                       className="text-xs px-2 py-2 min-w-10"
                     >
-                      <span className="hidden sm:inline text-xs">Hints</span>
+                      <span className="text-sm">Hints</span>
                     </CustomButton>
-                    <CustomButton
-                      variant="secondary"
-                      icon={<GridIcon size={16} />}
-                      onClick={() => setShowGrid(!showGrid)}
-                      aria-label="Toggle grid"
-                      className="text-xs px-2 py-2 min-w-10"
-                    >
-                      <span className="hidden sm:inline text-xs">Grid</span>
-                    </CustomButton>
+
+                    {debugMode && (
+                      <CustomButton
+                        variant="secondary"
+                        icon={<GridIcon size={16} />}
+                        onClick={() => setShowGrid(!showGrid)}
+                        aria-label="Toggle grid"
+                        className="text-xs px-2 py-2 min-w-10"
+                      >
+                        <span className="text-sm">Grid</span>
+                      </CustomButton>
+                    )}
+
                     <CustomButton
                       variant="secondary"
                       icon={<ArrowCounterClockwiseIcon size={16} />}
@@ -1692,7 +1718,7 @@
                       aria-label="Reset positions"
                       className="text-xs px-2 py-2 min-w-10"
                     >
-                      <span className="hidden sm:inline text-xs">Reset</span>
+                      <span className="text-sm">Reset</span>
                     </CustomButton>
                   </div>
                 </div>
