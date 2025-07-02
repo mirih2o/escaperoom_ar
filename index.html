@@ -39,7 +39,7 @@
         --color-symbol-star: #ffc107; /* Golden yellow for star */
         --color-symbol-moon: #9575cd; /* Soft purple for moon */
         --color-symbol-sun: #ff9800; /* Vibrant orange for sun */
-        
+
         /* UI component colors */
         --color-trophy: #f59e0b; /* Golden trophy color */
         --color-note-bg: #fffdf0; /* Paper note background */
@@ -58,17 +58,17 @@
         --text-gray-dark: rgb(18, 21, 26);
         --text-gray-medium: rgb(50, 55, 63);
         --text-gray-light: rgba(75, 85, 99, 1);
-        
+
         /* Success colors */
         --bg-success-light: rgba(240, 253, 244, 1);
         --border-success-light: rgba(167, 243, 208, 1);
         --text-success: rgba(22, 101, 52, 1);
         --text-success-muted: rgba(21, 128, 61, 1);
-        
+
         /* Drop shadow values */
         --drop-shadow-normal: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
         --drop-shadow-lifted: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-        
+
         /* Animation timing */
         --transition-fast: 0.2s ease;
         --transition-normal: 0.3s ease;
@@ -147,7 +147,7 @@
         box-shadow: 0 4px 15px var(--brown-shadow-light);
         border-color: var(--brown-border-hover);
       }
-      
+
       /* Message boxes and containers */
       .message-box {
         background-color: var(--bg-cream-translucent);
@@ -160,38 +160,38 @@
         margin-left: auto;
         margin-right: auto;
       }
-      
+
       .message-box-fixed-width {
         max-width: 24rem;
       }
-      
+
       .hint-content {
         line-height: 1.4;
       }
-      
+
       .hint-text {
         font-style: italic;
         text-align: center;
         margin-bottom: 0.75rem;
       }
-      
+
       .hint-symbol-text {
         font-size: 1.05rem;
       }
-      
+
       .hint-symbol-emoji {
         margin-top: 2px;
         font-size: 1.125rem;
       }
-      
+
       .icon-align-text-bottom {
         vertical-align: text-bottom;
       }
-      
+
       .trophy-icon {
         color: var(--color-trophy);
       }
-      
+
       .fixed-bottom-panel {
         position: fixed;
         left: 0.5rem;
@@ -200,27 +200,27 @@
         z-index: 20;
         margin-right: auto;
       }
-      
+
       .message-box-success {
         background-color: var(--bg-success-light);
         border-color: var(--border-success-light);
       }
-      
+
       /* Paper note styling for hints */
       .paper-note {
         background-color: var(--color-note-bg);
         padding: 0.75rem;
         border-radius: 2px;
-        box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
         transform: rotate(-1deg);
         position: relative;
-        font-family: 'Indie Flower', 'Inter', sans-serif;
+        font-family: "Indie Flower", "Inter", sans-serif;
         max-width: 28rem;
         margin-left: auto;
         margin-right: auto;
         border: none;
       }
-      
+
       .paper-note-title {
         font-weight: 600;
         font-size: 1.15rem;
@@ -229,7 +229,7 @@
         text-decoration: underline;
         color: var(--color-brown-dark);
       }
-      
+
       .paper-note-tape {
         position: absolute;
         width: 100px;
@@ -239,10 +239,10 @@
         left: 50%;
         transform: translateX(-50%) rotate(2deg);
         opacity: 0.7;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
         z-index: -1;
       }
-      
+
       /* Status indicators */
       .status-indicator {
         display: flex;
@@ -251,22 +251,22 @@
         gap: 0.25rem;
         font-size: 0.75rem;
       }
-      
+
       .status-indicator-dot {
         width: 0.375rem;
         height: 0.375rem;
         border-radius: 9999px;
       }
-      
+
       .status-indicator-active {
         color: var(--text-success);
       }
-      
+
       .status-indicator-active .status-indicator-dot {
         background-color: var(--text-success);
         animation: pulse 2s infinite;
       }
-      
+
       /* Symbol styling */
       .symbol {
         position: absolute;
@@ -278,13 +278,13 @@
         transition: var(--transition-normal);
         filter: var(--drop-shadow-normal);
       }
-      
+
       .symbol-dragging {
         z-index: 10;
         filter: var(--drop-shadow-lifted);
         transition: none;
       }
-      
+
       /* Text styles */
       .text-title {
         font-size: 1.25rem;
@@ -292,33 +292,39 @@
         color: var(--text-gray-dark);
         margin-bottom: 0.75rem;
       }
-      
+
       .text-subtitle {
         font-size: 1rem;
         font-weight: 500;
         color: var(--text-gray-medium);
         margin-bottom: 0.5rem;
       }
-      
+
       .m-0 {
         margin: 0;
       }
-      
+
       .text-body {
         font-size: 0.875rem;
         color: var(--text-gray-medium);
       }
-      
+
       /* Responsive text sizing */
       @media (min-width: 640px) {
-        .symbol { font-size: 2rem; }
-        .text-title { font-size: 1.5rem; }
+        .symbol {
+          font-size: 2rem;
+        }
+        .text-title {
+          font-size: 1.5rem;
+        }
       }
-      
+
       @media (min-width: 768px) {
-        .symbol { font-size: 2.5rem; }
+        .symbol {
+          font-size: 2.5rem;
+        }
       }
-      
+
       /* Animations */
       @keyframes pulse {
         0% {
@@ -334,7 +340,7 @@
           transform: scale(0.8);
         }
       }
-      
+
       .animate-pulse {
         animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
       }
@@ -363,78 +369,107 @@
       const TrophyIcon = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          fill="currentColor"
-          viewBox="0 0 256 256"
-          className={className}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
         >
-          <path d="M228,104a12.1,12.1,0,0,0-12,12V160a48,48,0,0,1-48,48H88a48,48,0,0,1-48-48V116a12.1,12.1,0,0,0-12-12,12,12,0,0,0,0,24v40a24,24,0,0,0,24,24h88a24,24,0,0,0,24-24V128a12,12,0,0,0,24,0v-12A12.1,12.1,0,0,0,228,104Zm-96-8A64,64,0,0,0,68,92V36a12,12,0,0,1,24,0V92a40,40,0,0,1,80,0V36a12,12,0,0,1,24,0V92A64,64,0,0,0,132,96Zm92-48a12,12,0,0,0-12-12H48a12,12,0,0,0,0,24H212A12,12,0,0,0,224,48Z"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 0 0 2.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 0 1 2.916.52 6.003 6.003 0 0 1-5.395 4.972m0 0a6.726 6.726 0 0 1-2.749 1.35m0 0a6.772 6.772 0 0 1-3.044 0"
+          />
         </svg>
       );
 
       const CameraIcon = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          fill="currentColor"
-          viewBox="0 0 256 256"
-          className={className}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
         >
-          <path d="M216,48H176L160,28A16,16,0,0,0,146.51,20H109.49A16,16,0,0,0,96,28L80,48H40A24,24,0,0,0,16,72V200a24,24,0,0,0,24,24H216a24,24,0,0,0,24-24V72A24,24,0,0,0,216,48ZM128,192a48,48,0,1,1,48-48A48.05,48.05,0,0,1,128,192Zm0-72a24,24,0,1,0,24,24A24,24,0,0,0,128,120Z"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6.827 6.175A2.31 2.31 0 0 1 5.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 0 0-1.134-.175 2.31 2.31 0 0 1-1.64-1.055l-.822-1.316a2.192 2.192 0 0 0-1.736-1.039 48.774 48.774 0 0 0-5.232 0 2.192 2.192 0 0 0-1.736 1.039l-.821 1.316Z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M16.5 12.75a4.5 4.5 0 1 1-9 0 4.5 4.5 0 0 1 9 0ZM18.75 10.5h.008v.008h-.008V10.5Z"
+          />
         </svg>
       );
 
       const ArrowCounterClockwiseIcon = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          fill="currentColor"
-          viewBox="0 0 256 256"
-          className={className}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
         >
-          <path d="M224,128a96,96,0,0,1-192,0,12,12,0,0,1,24,0,72,72,0,1,0,144,0,12,12,0,0,1,24,0Zm-91.13,10.34a12,12,0,0,0,17.43-1.63L168,96.34V64a12,12,0,0,0-24,0V82.34L117.63,65.34a12,12,0,0,0-15.5,18.17l23.5,20Z"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3"
+          />
         </svg>
       );
 
       const GridIcon = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          fill="currentColor"
-          viewBox="0 0 256 256"
-          className={className}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
         >
-          <path d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40ZM112,200H40V144h72Zm0-72H40V72h72Zm24,72v-56h72V200Zm72-72H136V72h72Z"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z"
+          />
         </svg>
       );
 
       const CaretRightIcon = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          fill="currentColor"
-          viewBox="0 0 256 256"
-          className={className}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
         >
-          <path d="M184.49,136.49l-80,80a12,12,0,0,1-17-17L159,128,87.51,56.49a12,12,0,1,1,17-17l80,80A12,12,0,0,1,184.49,136.49Z"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m8.25 4.5 7.5 7.5-7.5 7.5"
+          />
         </svg>
       );
 
       const LightbulbFilamentIcon = ({ size = 24, className = "" }) => (
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width={size}
-          height={size}
-          fill="currentColor"
-          viewBox="0 0 256 256"
-          className={className}
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="size-6"
         >
-          <path d="M128,24A96,96,0,0,0,51,180.3L40.7,208H215.3l-10.3-27.7A96,96,0,0,0,128,24Zm-4.1,137.9a12,12,0,0,1-16.1,4.4,12,12,0,0,1-4.4-16.1L121.9,128,107.4,98.6a12,12,0,0,1,4.4-16.1,12,12,0,0,1,16.1,4.4L134.1,128l14.5,29.4A12,12,0,0,1,123.9,161.9ZM168,208v16a8,8,0,0,1-16,0V208ZM88,208v16a8,8,0,0,1-16,0V208Z"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.383a14.406 14.406 0 0 1-3 0M14.25 18v-.192c0-.983.658-1.823 1.508-2.316a7.5 7.5 0 1 0-7.517 0c.85.493 1.509 1.333 1.509 2.316V18"
+          />
         </svg>
       );
 
@@ -964,14 +999,17 @@
                     // If cell is occupied, send the other symbol back to its initial position
                     // and place this symbol in the cell
                     const [otherSymbol] = occupyingSymbol;
-                    const initialPositions = calculateInitialPositions(currentStage);
+                    const initialPositions =
+                      calculateInitialPositions(currentStage);
                     updatedPositions = {
                       ...prevPositions,
                       [symbol]: {
                         x: gridOffsetX + (col + 0.5) * cellSize,
                         y: gridOffsetY + (row + 0.5) * cellSize,
                       },
-                      [otherSymbol]: initialPositions[otherSymbol] || prevPositions[otherSymbol]
+                      [otherSymbol]:
+                        initialPositions[otherSymbol] ||
+                        prevPositions[otherSymbol],
                     };
                   }
                 } else {
@@ -1345,7 +1383,7 @@
                       className="backdrop-blur-sm"
                       style={{
                         border: "2px solid rgba(255, 255, 255, 0.6)",
-                        backgroundColor: "rgba(255, 255, 255, 0.1)"
+                        backgroundColor: "rgba(255, 255, 255, 0.1)",
                       }}
                     />
                   ))}
@@ -1364,7 +1402,9 @@
                 return (
                   <div
                     key={symbol}
-                    className={`symbol ${draggedSymbol === symbol ? 'symbol-dragging' : ''}`}
+                    className={`symbol ${
+                      draggedSymbol === symbol ? "symbol-dragging" : ""
+                    }`}
                     data-symbol={symbol}
                     style={{
                       left: symbolPosition.x,
@@ -1407,12 +1447,19 @@
                         );
                       })
                       .map(([symbol, config]) => (
-                        <div key={symbol} className="flex items-start gap-2 mb-2">
-                          <span 
+                        <div
+                          key={symbol}
+                          className="flex items-start gap-2 mb-2"
+                        >
+                          <span
                             className="hint-symbol-emoji"
-                            style={{color: `var(--color-symbol-${symbol})`}}
-                          >{config.emoji}</span>
-                          <span className="hint-symbol-text">{config.hint}</span>
+                            style={{ color: `var(--color-symbol-${symbol})` }}
+                          >
+                            {config.emoji}
+                          </span>
+                          <span className="hint-symbol-text">
+                            {config.hint}
+                          </span>
                         </div>
                       ))}
                   </div>
@@ -1423,9 +1470,7 @@
             {!isARActive && (
               <div className="absolute inset-0 flex items-center justify-center z-10">
                 <div className="text-center p-6 bg-white rounded-xl shadow-lg border message-box message-box-fixed-width">
-                  <h2 className="text-title">
-                    AR Puzzle Game
-                  </h2>
+                  <h2 className="text-title">AR Puzzle Game</h2>
                   <CustomButton
                     variant="primary"
                     icon={<CameraIcon size={20} />}
@@ -1463,7 +1508,10 @@
                   {arInitialized && (
                     <>
                       <div className="flex justify-center items-center gap-3 mb-2">
-                        <span className="text-sm font-medium" style={{color: "var(--text-gray-medium)"}}>
+                        <span
+                          className="text-sm font-medium"
+                          style={{ color: "var(--text-gray-medium)" }}
+                        >
                           {discoveredSymbols.size}/3
                         </span>
                         <div className="flex gap-1">
@@ -1476,9 +1524,9 @@
                                   : "opacity-20 scale-90"
                               }`}
                               style={{
-                                color: discoveredSymbols.has(symbol) 
-                                  ? `var(--color-symbol-${symbol})` 
-                                  : 'inherit'
+                                color: discoveredSymbols.has(symbol)
+                                  ? `var(--color-symbol-${symbol})`
+                                  : "inherit",
                               }}
                             >
                               {symbol === "eye"
@@ -1501,7 +1549,7 @@
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-b-transparent border-blue-600"></div>
                       <button
                         onClick={() => setArInitialized(true)}
-                        className="px-2 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                        className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                       >
                         Skip
                       </button>
@@ -1522,10 +1570,16 @@
                   }`}
                 >
                   <div className="text-center">
-                    <h3 className="text-subtitle flex items-center justify-center gap-2" style={{color: "var(--text-success)"}}>
+                    <h3
+                      className="text-subtitle flex items-center justify-center gap-2"
+                      style={{ color: "var(--text-success)" }}
+                    >
                       ✅ All Symbols Found!
                     </h3>
-                    <p className="text-body" style={{color: "var(--text-success-muted)"}}>
+                    <p
+                      className="text-body"
+                      style={{ color: "var(--text-success-muted)" }}
+                    >
                       Drag symbols to solve the puzzle.
                     </p>
                   </div>
@@ -1541,13 +1595,11 @@
                     {!showFallbackButtons && (
                       <div className="message-box mb-2 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <span className="text-body">
-                            AR not working?
-                          </span>
+                          <span className="text-body">AR not working?</span>
                           <CustomButton
                             variant="secondary"
                             onClick={() => setShowFallbackButtons(true)}
-                            className="text-sm px-2 py-1 min-w-fit"
+                            className="text-xs px-2 py-1 min-w-fit"
                           >
                             Tap here
                           </CustomButton>
@@ -1573,9 +1625,9 @@
                                   : "btn-secondary"
                               }`}
                               style={{
-                                color: discoveredSymbols.has(symbol) 
-                                  ? "var(--text-success)" 
-                                  : `var(--color-symbol-${symbol})` 
+                                color: discoveredSymbols.has(symbol)
+                                  ? "var(--text-success)"
+                                  : `var(--color-symbol-${symbol})`,
                               }}
                             >
                               {symbol === "eye"
@@ -1603,27 +1655,27 @@
                       icon={<LightbulbFilamentIcon size={16} />}
                       onClick={() => setShowHints(!showHints)}
                       aria-label="Toggle hints"
-                      className="text-sm px-2 py-2 min-w-10"
+                      className="text-xs px-2 py-2 min-w-10"
                     >
-                      <span className="hidden sm:inline text-sm">Hints</span>
+                      <span className="hidden sm:inline text-xs">Hints</span>
                     </CustomButton>
                     <CustomButton
                       variant="secondary"
                       icon={<GridIcon size={16} />}
                       onClick={() => setShowGrid(!showGrid)}
                       aria-label="Toggle grid"
-                      className="text-sm px-2 py-2 min-w-10"
+                      className="text-xs px-2 py-2 min-w-10"
                     >
-                      <span className="hidden sm:inline text-sm">Grid</span>
+                      <span className="hidden sm:inline text-xs">Grid</span>
                     </CustomButton>
                     <CustomButton
                       variant="secondary"
                       icon={<ArrowCounterClockwiseIcon size={16} />}
                       onClick={resetPositions}
                       aria-label="Reset positions"
-                      className="text-sm px-2 py-2 min-w-10"
+                      className="text-xs px-2 py-2 min-w-10"
                     >
-                      <span className="hidden sm:inline text-sm">Reset</span>
+                      <span className="hidden sm:inline text-xs">Reset</span>
                     </CustomButton>
                   </div>
                 </div>
