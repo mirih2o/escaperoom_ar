@@ -35,18 +35,18 @@
         backdrop-filter: blur(4px);
       }
       .dialog-content {
-        background-color: #ffffff;
+        background-color: #f8f6f3;
         border-radius: 0.75rem;
         padding: 1.5rem;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
-          0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        box-shadow: 0 20px 25px -5px rgba(125, 95, 73, 0.15),
+          0 10px 10px -5px rgba(125, 95, 73, 0.08);
         max-width: 24rem; /* max-w-sm */
         width: 90%; /* w-11/12 */
-        border: 1px solid rgba(229, 231, 235, 0.8);
+        border: 1px solid rgba(187, 152, 114, 0.3);
       }
       .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
+        background: linear-gradient(135deg, #7D5F49 0%, #926D58 50%, #BB9872 100%);
+        color: #F5F5DC;
         padding: 1rem 2rem;
         border-radius: 1rem;
         font-weight: 600;
@@ -54,19 +54,20 @@
         min-height: 60px;
         font-size: 1rem;
         border: none;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 4px 15px rgba(125, 95, 73, 0.4);
       }
       .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 6px 20px rgba(125, 95, 73, 0.5);
+        background: linear-gradient(135deg, #926D58 0%, #BB9872 50%, #CCAA79 100%);
       }
       .btn-primary:active {
         transform: translateY(0);
-        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 2px 10px rgba(125, 95, 73, 0.4);
       }
       .btn-secondary {
-        background: rgba(255, 255, 255, 0.9);
-        color: #4a5568;
+        background: rgba(248, 246, 243, 0.95);
+        color: #7D5F49;
         padding: 0.5rem 0.75rem;
         border-radius: 0.5rem;
         font-weight: 500;
@@ -74,18 +75,19 @@
         min-height: 44px;
         min-width: 44px;
         font-size: 0.75rem;
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        border: 2px solid rgba(187, 152, 114, 0.3);
         backdrop-filter: blur(10px);
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 10px rgba(125, 95, 73, 0.1);
       }
       .btn-secondary:hover {
-        background: rgba(255, 255, 255, 0.95);
+        background: rgba(248, 246, 243, 1);
         transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        box-shadow: 0 4px 15px rgba(125, 95, 73, 0.2);
+        border-color: rgba(187, 152, 114, 0.5);
       }
       .btn-secondary:active {
         transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(125, 95, 73, 0.15);
       }
 
       /* Responsive font sizes for different screen sizes */
@@ -111,18 +113,18 @@
         } /* text-lg */
       }
       .text-accent-9 {
-        color: #6366f1; /* A shade of indigo, for accent */
+        color: #926D58; /* Antique brown accent */
       }
       .text-accent-11 {
-        color: #3730a3; /* A darker shade of indigo */
+        color: #7D5F49; /* Darker antique brown */
       }
       .bg-neutral-3 {
         background-color: rgba(
-          229,
-          231,
-          235,
+          248,
+          246,
+          243,
           0.9
-        ); /* Light gray with some transparency */
+        ); /* Warm antique white with transparency */
       }
     </style>
   </head>
@@ -327,6 +329,8 @@
         const [discoveredSymbols, setDiscoveredSymbols] = useState(new Set());
         const [positions, setPositions] = useState({});
         const [showAllSymbolsFoundMessage, setShowAllSymbolsFoundMessage] = useState(false);
+        const [showFallbackButtons, setShowFallbackButtons] = useState(false);
+
 
         const [cellSize, setCellSize] = useState(0);
         const [gridOffsetX, setGridOffsetX] = useState(0);
@@ -1111,13 +1115,13 @@
             {showHints && (
               <div className="fixed left-2 right-2 z-20" style={{ bottom: '100px' }}>
                 <div className="bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 max-w-md mx-auto">
-                  <div className="text-center text-base font-medium mb-2 text-gray-800">
-                    <LightbulbFilamentIcon className="text-yellow-500 inline mr-1" size={18} />
+                  <div className="text-center text-sm text-gray-800 font-medium mb-1">
+                    <LightbulbFilamentIcon className="text-yellow-500 inline mr-1" size={16} />
                     Puzzle Hints
                   </div>
-                  <div className="text-sm text-gray-600 space-y-2">
+                  <div className="text-xs text-gray-600 space-y-1">
                     {STAGES[currentStage].neutralHints?.hint && (
-                      <div className="text-center mb-3 font-medium">
+                      <div className="text-center mb-2">
                         {STAGES[currentStage].neutralHints.hint}
                       </div>
                     )}
@@ -1129,9 +1133,9 @@
                       .map(([symbol, config]) => (
                         <div
                           key={symbol}
-                          className="flex items-center gap-3"
+                          className="flex items-center gap-2"
                         >
-                          <span className="text-base">
+                          <span className="text-sm">
                             {config.emoji}
                           </span>
                           <span>
@@ -1146,18 +1150,18 @@
             )}
 
             {!isARActive && (
-              <div className="absolute inset-0 flex items-center justify-center z-10 bg-gradient-to-br from-blue-50 to-indigo-100">
+              <div className="absolute inset-0 flex items-center justify-center z-10">
                 <div className="text-center p-6 bg-white rounded-xl shadow-lg border border-gray-200 max-w-sm mx-4">
-                  <h2 className="text-2xl font-semibold text-gray-800 mb-4">AR Puzzle Game</h2>
+                  <h2 className="text-xl font-semibold text-gray-800 mb-3">AR Puzzle Game</h2>
                   <CustomButton
                     variant="primary"
-                    icon={<CameraIcon size={22} />}
+                    icon={<CameraIcon size={20} />}
                     onClick={startAR}
                     className="w-full"
                   >
                     Start AR Experience
                   </CustomButton>
-                  <p className="mt-4 text-base text-gray-600">
+                  <p className="mt-3 text-sm text-gray-600">
                     Find and scan AR markers to discover hidden symbols and unlock the puzzle grid
                   </p>
                 </div>
@@ -1166,12 +1170,12 @@
 
             {/* AR Scanning Instructions for Stage 1 */}
             {isARActive && currentStage === 0 && discoveredSymbols.size < 3 && (
-              <div className="fixed top-2 left-2 right-2 bg-white/95 backdrop-blur-sm p-4 rounded-lg z-20 shadow-lg border border-gray-200 max-w-md mx-auto">
+              <div className="fixed top-2 left-2 right-2 bg-white/95 backdrop-blur-sm p-3 rounded-lg z-20 shadow-lg border border-gray-200 max-w-md mx-auto">
                 <div className="text-center">
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1">
                     {arError ? '⚠️ Using Manual Mode' : arInitialized ? '🔍 Find Hidden Symbols' : '📷 Starting Camera...'}
                   </h3>
-                  <p className="text-sm sm:text-base text-gray-600 mb-3">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-2">
                     {arError ? 'Camera ready - Use manual buttons below' : arInitialized 
                       ? 'Point camera at markers or tap buttons below'
                       : 'Setting up detection...'
@@ -1179,15 +1183,15 @@
                   </p>
                   {arInitialized && (
                     <>
-                      <div className="flex justify-center items-center gap-4 mb-3">
-                        <span className="text-base font-medium text-gray-700">
+                      <div className="flex justify-center items-center gap-3 mb-2">
+                        <span className="text-sm font-medium text-gray-700">
                           {discoveredSymbols.size}/3
                         </span>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                           {['eye', 'flame', 'gear'].map((symbol) => (
                             <span
                               key={symbol}
-                              className={`text-xl transition-all duration-300 ${
+                              className={`text-lg transition-all duration-300 ${
                                 discoveredSymbols.has(symbol) 
                                   ? 'opacity-100 scale-110' 
                                   : 'opacity-20 scale-90'
@@ -1198,18 +1202,18 @@
                           ))}
                         </div>
                       </div>
-                      <div className="flex items-center justify-center gap-1 text-green-600 text-sm">
-                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                      <div className="flex items-center justify-center gap-1 text-green-600 text-xs">
+                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
                         AR Active
                       </div>
                     </>
                   )}
                   {!arInitialized && (
-                    <div className="flex justify-center items-center gap-3">
-                      <div className="animate-spin rounded-full h-5 w-5 border-2 border-b-transparent border-blue-600"></div>
+                    <div className="flex justify-center items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-b-transparent border-blue-600"></div>
                       <button
                         onClick={() => setArInitialized(true)}
-                        className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                        className="px-2 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
                       >
                         Skip
                       </button>
@@ -1222,15 +1226,15 @@
             {/* Grid revealed message for Stage 1 */}
             {isARActive && currentStage === 0 && discoveredSymbols.size === 3 && showGrid && (
               <div 
-                className={`fixed top-20 left-2 right-2 bg-green-50 border border-green-200 p-4 rounded-lg z-20 shadow-lg max-w-md mx-auto transition-opacity duration-1000 ${
+                className={`fixed top-20 left-2 right-2 bg-green-50 border border-green-200 p-3 rounded-lg z-20 shadow-lg max-w-md mx-auto transition-opacity duration-1000 ${
                   showAllSymbolsFoundMessage ? 'opacity-100' : 'opacity-0'
                 }`}
               >
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold text-green-800 mb-2 flex items-center justify-center gap-2">
+                  <h3 className="text-base font-semibold text-green-800 mb-1 flex items-center justify-center gap-2">
                     ✅ All Symbols Found!
                   </h3>
-                  <p className="text-base text-green-700">
+                  <p className="text-sm text-green-700">
                     Drag symbols to solve the puzzle.
                   </p>
                 </div>
@@ -1241,69 +1245,90 @@
               <div className="fixed bottom-0 left-0 right-0 z-20 p-2">
                 {/* Development/Fallback AR testing buttons */}
                 {currentStage === 0 && discoveredSymbols.size < 3 && (
-                  <div className="bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 mb-2 max-w-md mx-auto">
-                    <div className="text-center text-base text-gray-800 font-medium mb-2">
-                      Tap if AR scanning doesn't work
-                    </div>
-                    <div className="flex justify-center gap-2 flex-wrap">
-                      {['eye', 'flame', 'gear'].map((symbol) => (
-                        <button
-                          key={symbol}
-                          onClick={() => onMarkerDetected(symbol)}
-                          disabled={discoveredSymbols.has(symbol)}
-                          className={`px-4 py-3 rounded-lg text-sm font-medium transition-all flex-shrink-0 ${
-                            discoveredSymbols.has(symbol)
-                              ? 'bg-green-100 text-green-800 cursor-not-allowed'
-                              : 'bg-blue-500 text-white hover:bg-blue-600 active:scale-95'
-                          }`}
-                        >
-                          {symbol === 'eye' ? '👁️ Eye' : symbol === 'flame' ? '🔥 Flame' : '⚙️ Gear'}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <>
+                    {/* AR not working prompt */}
+                    {!showFallbackButtons && (
+                      <div className="bg-white/95 backdrop-blur-sm p-2 rounded-lg shadow-lg border border-gray-200 mb-2 max-w-md mx-auto text-center">
+                        <div className="flex items-center justify-center gap-2">
+                          <span className="text-sm text-gray-600">AR not working?</span>
+                          <CustomButton
+                            variant="secondary"
+                            onClick={() => setShowFallbackButtons(true)}
+                            className="text-xs px-2 py-1 min-w-fit"
+                          >
+                            Tap here
+                          </CustomButton>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Fallback buttons - only show when requested */}
+                    {showFallbackButtons && (
+                      <div className="bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 mb-2 max-w-md mx-auto">
+                        <div className="text-center text-sm text-gray-800 font-medium mb-1">
+                          Tap to discover symbols manually
+                        </div>
+                        <div className="flex justify-center gap-2 flex-wrap">
+                          {['eye', 'flame', 'gear'].map((symbol) => (
+                            <button
+                              key={symbol}
+                              onClick={() => onMarkerDetected(symbol)}
+                              disabled={discoveredSymbols.has(symbol)}
+                              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex-shrink-0 ${
+                                discoveredSymbols.has(symbol)
+                                  ? 'bg-green-100 text-green-800 cursor-not-allowed'
+                                  : 'btn-secondary'
+                              }`}
+                            >
+                              {symbol === 'eye' ? '👁️ Eye' : symbol === 'flame' ? '🔥 Flame' : '⚙️ Gear'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </>
                 )}
 
                 <div className="flex flex-row justify-between items-center bg-white/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 max-w-md mx-auto">
                   <div className="flex items-center gap-3">
-                    <span className="text-base font-semibold text-gray-800">
+                    <span className="text-sm font-semibold text-gray-800">
                       Stage {currentStage + 1}/{STAGES.length}
                     </span>
                   </div>
                   <div className="flex flex-row gap-1 sm:gap-2 items-center">
-                  <CustomButton
-                    variant="secondary"
-                    icon={<LightbulbFilamentIcon size={18} />}
-                    onClick={() => setShowHints(!showHints)}
-                    aria-label="Toggle hints"
-                    className="text-sm px-3 py-2 min-w-12"
-                  >
-                    <span className="hidden sm:inline text-sm">
-                      Hints
-                    </span>
-                  </CustomButton>
-                  <CustomButton
-                    variant="secondary"
-                    icon={<GridIcon size={18} />}
-                    onClick={() => setShowGrid(!showGrid)}
-                    aria-label="Toggle grid"
-                    className="text-sm px-3 py-2 min-w-12"
-                  >
-                    <span className="hidden sm:inline text-sm">
-                      Grid
-                    </span>
-                  </CustomButton>
-                  <CustomButton
-                    variant="secondary"
-                    icon={<ArrowCounterClockwiseIcon size={18} />}
-                    onClick={resetPositions}
-                    aria-label="Reset positions"
-                    className="text-sm px-3 py-2 min-w-12"
-                  >
-                    <span className="hidden sm:inline text-sm">
-                      Reset
-                    </span>
-                  </CustomButton>
+                    <CustomButton
+                      variant="secondary"
+                      icon={<LightbulbFilamentIcon size={16} />}
+                      onClick={() => setShowHints(!showHints)}
+                      aria-label="Toggle hints"
+                      className="text-xs px-2 py-2 min-w-10"
+                    >
+                      <span className="hidden sm:inline text-xs">
+                        Hints
+                      </span>
+                    </CustomButton>
+                    <CustomButton
+                      variant="secondary"
+                      icon={<GridIcon size={16} />}
+                      onClick={() => setShowGrid(!showGrid)}
+                      aria-label="Toggle grid"
+                      className="text-xs px-2 py-2 min-w-10"
+                    >
+                      <span className="hidden sm:inline text-xs">
+                        Grid
+                      </span>
+                    </CustomButton>
+                    <CustomButton
+                      variant="secondary"
+                      icon={<ArrowCounterClockwiseIcon size={16} />}
+                      onClick={resetPositions}
+                      aria-label="Reset positions"
+                      className="text-xs px-2 py-2 min-w-10"
+                    >
+                      <span className="hidden sm:inline text-xs">
+                        Reset
+                      </span>
+                    </CustomButton>
                   </div>
                 </div>
               </div>
